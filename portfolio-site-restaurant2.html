@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site web de restaurant</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styles pour le slider */
+        .slider {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slides img {
+            width: 100%;
+            border: none;
+        }
+
+        .slider-nav {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .slider-nav button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            background: url(cover_overlay.png) no-repeat center/100% 100%,url(cover.jpg) no-repeat center/cover;
+
+        }
+        .slides iframe {
+            width: 100%;
+            height: 400px; /* Ajustez la hauteur selon vos besoins */
+            border: none;
+            position: relative;
+        }
+        
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="portfolio-header">
+        <div class="texte-avec-ligne-verticale"
+        style="margin-left: 16px; margin-top: 22px; height: 45px">
+            <p class="portfolio-header-title">Omar Atta Y M</p>
+        </div>
+        <a class="contact-button contact-button-portfolio"
+        href="mailto:attaomar66@gmail.com?subject=Contact%20depuis%20attaomar.com">ME CONTACTER</a>
+
+    </div>
+
+    <!-- SECTION GRISE TITRE -->
+    <div class="section section-grise1" style="padding-top:20px">
+        <a class="portfolio-back" href="index.html">Retour</a>
+        <div class="separateur" style="margin-top:-12px;"></div>
+        <h1 class="portfolio">Portfolio</h1>
+        <h2 class="portfolio">Site web pour un restaurant</h2>
+    </div>
+
+    <!-- SECTION CONTENU -->
+    <div class="section">
+        <div class="texte-avec-ligne-verticale">
+            <p>
+                J’ai réalisé ce projet web pour un client travaillant dans le domaine de la restauration.
+                <br><br>
+                L’objectif ? Permettre à ce restaurant  la réservation en ligne  et de proposer son menu  aux utilisateurs .
+                <br><br>
+                Mon client, étant novice dans les nouvelles technologies, à la possibilité de modifier facilement son menu en ligne grâce à une interface d’administration sur-mesure que j’ai réalisé.
+                <br><br>
+                Ce projet simple mais fonctionnel a donné entière satisfaction à mon client.
+                <br><br>
+                <u>Technologies utilisées :</u> <b>HTML, CSS, Laravel, Render</b>
+
+            </p>
+
+            <div class="slider">
+                <div class="slides" >
+                    <iframe src="" title="Project HTML 1" ></iframe>
+                    <iframe src="Acceuil.html" title="Project HTML 2" ></iframe>
+                    <iframe src="Menu Restaurant.html" title="Project HTML 3" ></iframe>
+                </div>
+            </div>
+            <div class="slider-nav ">
+            <div class="slider">
+                <button class ="contact-button "  onclick="prevSlide()">&#10094; Précédent</button>
+                <button class ="contact-button" onclick="nextSlide()">Suivant &#10095;</button>
+            </div>
+        </div>
+        </div>
+            <div style="text-align: center; margin-top: 30px">
+                <!-- <a style="display: block; margin-top: 8px;" href="https://jrpizzamamadjango2.herokuapp.com">Consulter le projet</a> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FRAME -->
+    <iframe src="contact-frame.html" scrolling="no"></iframe>
+
+    <script>
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            const slides = document.querySelector('.slides');
+            const totalSlides = slides.children.length;
+            if (index >= totalSlides) {
+                currentSlide = 0;
+            } else if (index < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = index;
+            }
+            const offset = -currentSlide * 100;
+            slides.style.transform = `translateX(${offset}%)`;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+    </script>
+</body>
+</html>
