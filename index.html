@@ -53,18 +53,18 @@
    <!-- COUVERTURE -->
     <div class="cover" id="cover">
         <img class="cover-profile round-image" src="WhatsApp Image 2025-08-03 à 15.08.44_50c4ff3a.jpg"/>
-        <h1>Omar Atta Y M</h1>
-        <p>Développeur IA && Logiciel Freelance | 4 ans d'expérience</p>
+          <h1 id="typewriter">Omar Atta Y M</h1>
+        <p id="subtitle">Développeur IA && Logiciel Freelance | 4 ans d'expérience</p>
 
         <div style="text-align: center;">
             <a class="contact-button" href="mailto:attaomar66@gmail.com?subject=Contact%20depuis%20omaratta.com">ME CONTACTER</a>
         </div>
         <div class="cover-contact">
-            <p class="contact-item">
+            <p id="subtitle" class="contact-item">
                 <img class="envelope-icon" src="envelope.png" alt="Envelope Icon"/>
                 <a href="mailto:attaomar66@gmail.com?subject=Contact%20depuis%20omaratta.com">attaomar66@gmail.com</a>
             </p>
-            <p class="contact-item">
+            <p id="subtitle">class="contact-item">
                 <img class="phone-icon" src="phone.png" alt="Phone Icon"/>
                 <a href="tel:+21699803190">06 12 34 56 78</a>
             </p>
@@ -73,7 +73,7 @@
 
   <!-- SECTION GRISE 1 -->
   <div class="section bg-light text-center p-4">
-    <p>Je développe <b>votre projet IA & WEB</b> ou vos <b>Applications mobiles</b> iOS/Android de A à Z</p>
+    <p id="subtitle">Je développe <b>votre projet IA & WEB</b> ou vos <b>Applications mobiles</b> iOS/Android de A à Z</p>
   </div>
 
   <!-- SECTION BLANCHE -->
@@ -84,7 +84,7 @@
       </div>
       <div class="col-md-8">
         <h2>En savoir plus</h2>
-        <p>
+        <p id="subtitle">
           Passionné par la programmation depuis le plus jeune âge, je suis maintenant développeur professionnel avec plus de 4 ans d’expérience.<br><br>
           Expert dans les domaines du <b>web</b>, de <b>l'intelligence artificielle (IA)</b> et des <b>applications mobiles</b>, je propose mes services personnalisés pour des missions freelance.
         </p>
@@ -210,6 +210,45 @@
 
   <!-- CONTACT FRAME -->
   <iframe src="contact-frame.html" scrolling="no" style="width:100%; border:none; height:300px;"></iframe>
+
+
+
+<script>
+const titles = [
+    "Omar Atta Y M",
+    "Développeur IA && Logiciel Freelance",
+    "4 ans d'expérience"
+];
+
+let i = 0, j = 0;
+let currentText = "";
+let isDeleting = false;
+
+function typeWriter() {
+    const h1 = document.getElementById("typewriter");
+
+    if (i < titles.length) {
+        if (!isDeleting && j <= titles[i].length) {
+            currentText = titles[i].substring(0, j++);
+        } else if (isDeleting && j >= 0) {
+            currentText = titles[i].substring(0, j--);
+        }
+
+        h1.textContent = currentText;
+
+        if (!isDeleting && j === titles[i].length) {
+            setTimeout(() => isDeleting = true, 1500);
+        } else if (isDeleting && j === 0) {
+            isDeleting = false;
+            i = (i + 1) % titles.length;
+        }
+    }
+    setTimeout(typeWriter, isDeleting ? 50 : 100);
+}
+
+document.addEventListener("DOMContentLoaded", typeWriter);
+</script>
+
 
 </body>
 </html>
