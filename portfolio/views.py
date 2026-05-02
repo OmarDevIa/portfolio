@@ -356,3 +356,87 @@ def sitemap_images(request):
 
     xml_bytes = ET.tostring(urlset, encoding='utf-8', xml_declaration=True)
     return HttpResponse(xml_bytes, content_type='application/xml')
+
+
+def _build_error_context(request, code, title, message):
+    """
+    name : build_error_context
+    description : Prepare le contexte pour les pages d'erreur.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    return {
+        'error_code': code,
+        'error_title': title,
+        'error_message': message,
+        'error_path': getattr(request, 'path', ''),
+    }
+
+
+def bad_request(request, exception=None):
+    """
+    name : bad_request
+    description : Affiche la page 400 (requete invalide).
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    context = _build_error_context(
+        request,
+        400,
+        'Requete invalide',
+        "La requete n'a pas pu etre traitee.",
+    )
+    return render(request, '400.html', context, status=400)
+
+
+def permission_denied(request, exception=None):
+    """
+    name : permission_denied
+    description : Affiche la page 403 (acces refuse).
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    context = _build_error_context(
+        request,
+        403,
+        'Acces refuse',
+        "Vous n'avez pas les droits pour acceder a cette page.",
+    )
+    return render(request, '403.html', context, status=403)
+
+
+def page_not_found(request, exception=None):
+    """
+    name : page_not_found
+    description : Affiche la page 404 (page introuvable).
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    context = _build_error_context(
+        request,
+        404,
+        'Page introuvable',
+        "La page demandee n'existe pas ou a ete deplacee.",
+    )
+    return render(request, '404.html', context, status=404)
+
+
+def server_error(request):
+    """
+    name : server_error
+    description : Affiche la page 500 (erreur serveur).
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    context = _build_error_context(
+        request,
+        500,
+        'Erreur serveur',
+        "Une erreur interne est survenue. Reessayez plus tard.",
+    )
+    return render(request, '500.html', context, status=500)

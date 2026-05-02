@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur 500</title>
+    <style>
+        body { margin: 0; font-family: "Manrope", Arial, sans-serif; background: #0f1115; color: #f5f5f5; }
+        .wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        .card { max-width: 640px; width: 100%; background: #151820; border: 1px solid #2a2f3a; border-radius: 16px; padding: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
+        .code { font-size: 56px; font-weight: 700; letter-spacing: 2px; color: #e74c3c; margin: 0 0 10px; }
+        .title { font-size: 24px; margin: 0 0 10px; }
+        .desc { color: #b5bac7; line-height: 1.6; margin: 0 0 20px; }
+        .path { font-size: 14px; color: #8a90a2; margin-bottom: 24px; }
+        .cta { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #e74c3c; color: #0f1115; border-radius: 999px; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card">
+            <p class="code">500</p>
+            <h1 class="title">Erreur serveur</h1>
+            <p class="desc">Une erreur interne est survenue. Reessayez plus tard.</p>
+            {% if error_path %}
+            <div class="path">Chemin: {{ error_path }}</div>
+            {% endif %}
+            <a class="cta" href="/">Retour a l'accueil</a>
+        </div>
+    </div>
+</body>
+</html>

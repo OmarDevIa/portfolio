@@ -22,5 +22,10 @@ urlpatterns = [
     path('', include('portfolio.urls')),
 ]
 
+handler400 = 'portfolio.views.bad_request'
+handler403 = 'portfolio.views.permission_denied'
+handler404 = 'portfolio.views.page_not_found'
+handler500 = 'portfolio.views.server_error'
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
