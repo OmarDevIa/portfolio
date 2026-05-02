@@ -54,12 +54,13 @@ class PortfolioFlowTests(TestCase):
 	def test_home_page_loads(self):
 		response = self.client.get(reverse('home'))
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, 'Dossiers visuels')
+		self.assertContains(response, 'Projets')
+		self.assertContains(response, 'Réalisations')
 		self.assertIn('category_groups', response.context)
 		self.assertContains(response, 'data-filter="ia"', html=False)
-		self.assertContains(response, 'portfolio-visual-row', html=False)
-		self.assertContains(response, 'project-browser-mockup', html=False)
-		self.assertContains(response, 'tech-badge', html=False)
+		self.assertContains(response, 'project-item-card', html=False)
+		self.assertContains(response, 'project-tags-row', html=False)
+		self.assertContains(response, 'project-tag-pill', html=False)
 		self.assertContains(response, 'Omar Atta Dynamic')
 		self.assertContains(response, 'Slide administrable')
 		self.assertContains(response, 'dynamic@example.com')
@@ -67,26 +68,26 @@ class PortfolioFlowTests(TestCase):
 	def test_about_page_loads(self):
 		response = self.client.get(reverse('about'))
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, 'A propos')
+		self.assertContains(response, 'À propos')
 		self.assertContains(response, 'Omar Atta Dynamic')
 
 	def test_references_page_loads(self):
 		response = self.client.get(reverse('references'))
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, 'KPIs et retours clients')
+		self.assertContains(response, 'Références clients & résultats IA')
 		self.assertContains(response, 'Impact mesurable')
 
 	def test_process_page_loads(self):
 		response = self.client.get(reverse('process'))
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, 'Mon processus en 4 etapes')
+		self.assertContains(response, 'Processus de livraison IA & logiciel')
 
 	def test_project_detail_page_uses_visual_showcase(self):
 		response = self.client.get(reverse('project_detail', args=[self.project.slug]))
 		self.assertEqual(response.status_code, 200)
-		self.assertContains(response, 'project-showcase-shell', html=False)
-		self.assertContains(response, 'Pourquoi ce projet compte')
-		self.assertContains(response, 'project-browser-mockup--detail', html=False)
+		self.assertContains(response, 'pd-hero', html=False)
+		self.assertContains(response, 'À propos du projet')
+		self.assertContains(response, 'pd-img-wrap', html=False)
 
 	def test_project_detail_prefers_uploaded_video_file(self):
 		self.project.demo_video_file = SimpleUploadedFile('demo.webm', VIDEO_BYTES, content_type='video/webm')
