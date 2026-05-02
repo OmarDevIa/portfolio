@@ -167,6 +167,15 @@ class SiteProfile(models.Model):
     def get_tech_stack_items(self):
         return [item.strip() for item in self.tech_stack_marquee.split(',') if item.strip()]
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete('site_profile')
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        cache.delete('site_profile')
+        return result
+
 
 class CertificationBadge(models.Model):
     site_profile = models.ForeignKey(
@@ -192,6 +201,15 @@ class CertificationBadge(models.Model):
 
     def __str__(self):
         return self.label
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete('site_profile')
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        cache.delete('site_profile')
+        return result
 
 
 class HeroSlide(models.Model):
