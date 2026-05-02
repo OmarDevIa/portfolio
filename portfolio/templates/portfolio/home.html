@@ -10,7 +10,7 @@
 
             <!-- Sidebar flottante sticky -->
             <div class="col-lg-3">
-                <div class="profile-card text-center">
+                <div class="profile-card text-center reveal">
                     {% if site_profile.profile_photo %}
                     <img src="{{ site_profile.profile_photo.url }}"
                          alt="{{ site_profile.full_name }}"
@@ -49,7 +49,7 @@
 
             <!-- Contenu droite -->
             <div class="col-lg-9">
-                <div class="about-content animate-fadein">
+                <div class="about-content animate-fadein reveal">
                     <p class="about-hello">Bonjour !</p>
                     <h1 class="about-title">
                         Je suis <span>{{ site_profile.full_name }}</span>,<br>
@@ -68,7 +68,7 @@
                         <a href="#contact" class="btn-outline">Me contacter</a>
                     </div>
                 </div>
-                <div class="tech-marquee-wrap">
+                <div class="tech-marquee-wrap reveal">
                     <div class="tech-marquee-inner">
                         {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
                         {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
@@ -85,12 +85,12 @@
         <div class="container-inner">
             <div class="section-head text-center">
                 <p class="section-sub">Services</p>
-                <h2 class="section-title">Ce que je fais</h2>
+                <h2 class="section-title title-reveal reveal">Ce que je fais</h2>
             </div>
             <div class="row g-4">
                 {% for service in services %}
                 <div class="col-lg-4 col-md-6 animate-up" style="animation-delay:{{ forloop.counter0 }}00ms">
-                    <div class="service-item">
+                    <div class="service-item reveal">
                         <i class="{{ service.icon }}"></i>
                         <h4>{{ service.title }}</h4>
                         <p>{{ service.description }}</p>
@@ -107,12 +107,12 @@
     <div class="container">
         <div class="section-head text-center">
             <p class="section-sub">Stack technique</p>
-            <h2 class="section-title">Compétences</h2>
+            <h2 class="section-title title-reveal reveal">Compétences</h2>
         </div>
         <div class="row g-3">
             {% for skill in skills %}
             <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-6 animate-up" style="animation-delay:{{ forloop.counter0 }}0ms">
-                <div class="skill-item text-center">
+                <div class="skill-item text-center reveal">
                     <i class="{{ skill.icon }} skill-big-icon"></i>
                     <h5>{{ skill.title }}</h5>
                     <span class="skill-cat-badge">{{ skill.get_category_display }}</span>
@@ -148,7 +148,7 @@
     <div class="container">
         <div class="container-inner">
             <div class="section-head text-center">
-                <h2 class="section-title">Projets & Réalisations</h2>
+                <h2 class="section-title title-reveal reveal">Projets & Réalisations</h2>
                 <p class="section-desc">Des projets concrets, orientés résultats et livrables mesurables.</p>
             </div>
             <ul class="project-filter">
@@ -160,7 +160,7 @@
             <div class="row g-4 project-grid">
                 {% for project in projects|slice:":6" %}
                 <div class="col-lg-4 col-md-6 project-item animate-up" data-category="{{ project.category }}" style="animation-delay:{{ forloop.counter0 }}00ms">
-                    <div class="project-item-card">
+                    <div class="project-item-card reveal">
                         <div class="project-img-wrap">
                             <img src="{{ project.thumbnail.url }}"
                                  alt="{{ project.title }}"
@@ -197,12 +197,12 @@
     <div class="container">
         <div class="section-head text-center">
             <p class="section-sub">Témoignages</p>
-            <h2 class="section-title">Ce que disent mes clients</h2>
+            <h2 class="section-title title-reveal reveal">Ce que disent mes clients</h2>
         </div>
         <div class="row g-4">
             {% for t in testimonials|slice:":3" %}
             <div class="col-lg-4 col-md-6 animate-up" style="animation-delay:{{ forloop.counter0 }}00ms">
-                <div class="testi-card">
+                <div class="testi-card reveal">
                     <div class="testi-top">
                         {% if t.project %}
                         <div class="testi-project-thumb">
@@ -246,12 +246,12 @@
         <div class="container-inner">
             <div class="section-head text-center">
                 <p class="section-sub">Contact</p>
-                <h2 class="section-title">Travaillons ensemble</h2>
+                <h2 class="section-title title-reveal reveal">Travaillons ensemble</h2>
             </div>
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="contact-info-block">
-                        <a href="mailto:{{ site_profile.email }}" class="contact-info-item">
+                        <a href="mailto:{{ site_profile.email }}" class="contact-info-item reveal">
                             <div class="ci-icon"><i class="fas fa-envelope"></i></div>
                             <div>
                                 <h6>Email</h6>
@@ -259,7 +259,7 @@
                             </div>
                         </a>
                         {% if site_profile.whatsapp_url %}
-                        <a href="{{ site_profile.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="contact-info-item">
+                        <a href="{{ site_profile.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="contact-info-item reveal">
                             <div class="ci-icon ci-icon--wa"><i class="fab fa-whatsapp"></i></div>
                             <div>
                                 <h6>WhatsApp</h6>
@@ -268,7 +268,7 @@
                         </a>
                         {% endif %}
                         {% if site_profile.linkedin_url %}
-                        <a href="{{ site_profile.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="contact-info-item">
+                        <a href="{{ site_profile.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="contact-info-item reveal">
                             <div class="ci-icon ci-icon--li"><i class="fab fa-linkedin"></i></div>
                             <div>
                                 <h6>LinkedIn</h6>
@@ -282,7 +282,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    <div class="contact-form-wrap">
+                    <div class="contact-form-wrap reveal">
                         <div id="formAlert" class="form-msg d-none"></div>
                         <form id="contactForm" action="{% url 'contact' %}" method="post" novalidate>
                             {% csrf_token %}

@@ -13,6 +13,9 @@
     --radius-sm: 10px;
     --shadow: 0 2px 20px rgba(0,0,0,0.06);
     --shadow-hover: 0 8px 32px rgba(0,0,0,0.12);
+    --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-soft: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --reveal-distance: 18px;
 }
 
 body[data-theme='night'] {
@@ -138,6 +141,21 @@ ul, li { list-style: none; }
     line-height: 1.15;
     margin-bottom: 0.5rem;
 }
+.title-reveal {
+    position: relative;
+    display: inline-block;
+    color: transparent;
+    background-image: linear-gradient(90deg, var(--text), var(--text));
+    background-size: 0% 100%;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition: background-size 0.75s var(--ease-smooth);
+}
+.title-reveal.is-visible {
+    background-size: 100% 100%;
+}
 .section-desc { color: var(--muted); font-size: 0.95rem; }
 
 /* ── PROFILE CARD ── */
@@ -158,6 +176,7 @@ ul, li { list-style: none; }
     border: 3px dashed var(--accent);
     padding: 6px;
     margin: 0 auto 1.2rem;
+    animation: floatY 6s var(--ease-soft) infinite;
 }
 
 .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
@@ -1131,12 +1150,37 @@ ul, li { list-style: none; }
     from { opacity: 0; }
     to   { opacity: 1; }
 }
+@keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(var(--reveal-distance)) scale(0.98);
+    filter: blur(4px);
+    transition: opacity 0.7s var(--ease-smooth),
+                transform 0.7s var(--ease-smooth),
+                filter 0.7s var(--ease-smooth);
+    will-change: opacity, transform, filter;
+}
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
 
 .animate-fadein {
     animation: fadeIn 0.7s ease both;
+    animation-play-state: paused;
 }
 .animate-up {
     animation: fadeInUp 0.6s ease both;
+    animation-play-state: paused;
+}
+.animate-fadein.is-visible,
+.animate-up.is-visible {
+    animation-play-state: running;
 }
 
 /* Lazy loading fade-in sur images */
@@ -1146,6 +1190,12 @@ img[loading="lazy"] {
 }
 img[loading="lazy"].loaded {
     opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    .reveal { opacity: 1; transform: none; filter: none; }
+    .title-reveal { color: var(--text); background: none; }
 }
 
 /* ── PRINT STYLESHEET ── */
