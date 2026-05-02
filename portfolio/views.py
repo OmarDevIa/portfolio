@@ -68,6 +68,12 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
                 'count': grouped_projects.count(),
             })
 
+    cert_total = site_profile.certification_badges.count()
+    if site_profile.primary_certificate_label:
+        cert_total += 1
+    if site_profile.secondary_certificate_label:
+        cert_total += 1
+
     context = {
         'projects': projects,
         'featured': projects.filter(is_featured=True),
@@ -82,6 +88,7 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
         'category_groups': category_groups,
         'site_profile': site_profile,
         'hero_slides': _get_hero_slides(),
+        'cert_total': cert_total,
     }
     context.update(_build_seo_context(request))
     return context

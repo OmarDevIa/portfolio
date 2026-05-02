@@ -61,19 +61,34 @@
                     </div>
                     <p class="about-desc">{{ site_profile.hero_description }}</p>
                     <div class="about-btns">
+                        <a href="#contact" class="btn-main">Me contacter</a>
                         <a href="{% if site_profile.cv_file %}{{ site_profile.cv_file.url }}{% else %}{% static 'img/cv.pdf' %}{% endif %}"
-                           target="_blank" rel="noopener noreferrer" class="btn-main">
+                           target="_blank" rel="noopener noreferrer" class="btn-outline">
                             Télécharger CV <i class="fas fa-download ms-1"></i>
                         </a>
-                        <a href="#contact" class="btn-outline">Me contacter</a>
                     </div>
                 </div>
-                <div class="tech-marquee-wrap reveal">
-                    <div class="tech-marquee-inner">
-                        {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
-                        {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
+                {% if hero_slides %}
+                <div class="hero-slider reveal" id="heroSlider">
+                    <div class="hero-slider-track">
+                        {% for slide in hero_slides %}
+                        <article class="hero-slide hero-slide--{{ slide.theme }}{% if forloop.first %} is-active{% endif %}">
+                            <div class="hero-slide-top">
+                                <span class="hero-slide-eyebrow">{{ slide.eyebrow }}</span>
+                                <span class="hero-slide-icon"><i class="{{ slide.icon }}"></i></span>
+                            </div>
+                            <h3 class="hero-slide-title">{{ slide.title }}</h3>
+                            <p class="hero-slide-desc">{{ slide.description }}</p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    <div class="hero-slider-dots" role="tablist" aria-label="Slides hero">
+                        {% for slide in hero_slides %}
+                        <button class="hero-dot{% if forloop.first %} is-active{% endif %}" type="button" aria-label="Slide {{ forloop.counter }}" data-index="{{ forloop.counter0 }}"></button>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -84,8 +99,8 @@
     <div class="container">
         <div class="container-inner">
             <div class="section-head text-center">
-                <p class="section-sub">Services</p>
-                <h2 class="section-title title-reveal reveal">Ce que je fais</h2>
+                <p class="section-sub">{{ site_profile.services_section_subtitle }}</p>
+                <h2 class="section-title title-reveal reveal">{{ site_profile.services_section_title }}</h2>
             </div>
             <div class="row g-4">
                 {% for service in services %}
@@ -106,8 +121,8 @@
 <section id="skills" class="section-area section-alt">
     <div class="container">
         <div class="section-head text-center">
-            <p class="section-sub">Stack technique</p>
-            <h2 class="section-title title-reveal reveal">Compétences</h2>
+            <p class="section-sub">{{ site_profile.skills_section_subtitle }}</p>
+            <h2 class="section-title title-reveal reveal">{{ site_profile.skills_section_title }}</h2>
         </div>
         <div class="row g-3">
             {% for skill in skills %}
@@ -144,16 +159,16 @@
 </section>
 
 <!-- OUTILS & PLATEFORMES -->
-<section id="tools" class="section-area">
+<section id="tools" class="section-area section-gap-top">
     <div class="container">
         <div class="container-inner">
             <div class="section-head text-center">
-                <p class="section-sub">Outils & plateformes</p>
-                <h2 class="section-title title-reveal reveal">Stack operationnelle</h2>
-                <p class="section-desc">Des outils robustes pour livrer vite, securiser l'execution et scaler proprement.</p>
+                <p class="section-sub">{{ site_profile.tools_section_subtitle }}</p>
+                <h2 class="section-title title-reveal reveal">{{ site_profile.tools_section_title }}</h2>
+                <p class="section-desc">{{ site_profile.tools_section_desc }}</p>
             </div>
             <div class="tools-intro reveal">
-                Une vision plus visuelle de mon ecosysteme : chaque bloc combine un logo avec les plateformes que j'utilise au quotidien.
+                {{ site_profile.tools_section_intro }}
             </div>
             <div class="row g-4 tools-grid">
                 {% for tool in tools %}
@@ -172,13 +187,20 @@
     </div>
 </section>
 
+<div class="tech-marquee-wrap reveal">
+    <div class="tech-marquee-inner">
+        {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
+        {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
+    </div>
+</div>
+
 <!-- PORTFOLIO -->
 <section id="portfolio" class="section-area">
     <div class="container">
         <div class="container-inner">
             <div class="section-head text-center">
-                <h2 class="section-title title-reveal reveal">Projets & Réalisations</h2>
-                <p class="section-desc">Des projets concrets, orientés résultats et livrables mesurables.</p>
+                <h2 class="section-title title-reveal reveal">{{ site_profile.portfolio_section_title }}</h2>
+                <p class="section-desc">{{ site_profile.portfolio_section_desc }}</p>
             </div>
             <ul class="project-filter">
                 <li data-filter="all" class="active">Tous</li>
@@ -225,8 +247,8 @@
 <section id="testimonials" class="section-area section-alt">
     <div class="container">
         <div class="section-head text-center">
-            <p class="section-sub">Témoignages</p>
-            <h2 class="section-title title-reveal reveal">Ce que disent mes clients</h2>
+            <p class="section-sub">{{ site_profile.testimonials_section_subtitle }}</p>
+            <h2 class="section-title title-reveal reveal">{{ site_profile.testimonials_section_title }}</h2>
         </div>
         <div class="row g-4">
             {% for t in testimonials|slice:":3" %}
@@ -274,8 +296,8 @@
     <div class="container">
         <div class="container-inner">
             <div class="section-head text-center">
-                <p class="section-sub">Contact</p>
-                <h2 class="section-title title-reveal reveal">Travaillons ensemble</h2>
+                <p class="section-sub">{{ site_profile.contact_section_subtitle }}</p>
+                <h2 class="section-title title-reveal reveal">{{ site_profile.contact_section_title }}</h2>
             </div>
             <div class="row g-4">
                 <div class="col-lg-4">

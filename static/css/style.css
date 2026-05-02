@@ -164,6 +164,7 @@ ul, li { list-style: none; }
 .about-area { padding-top: 120px; padding-bottom: 60px; }
 .section-area { padding: 70px 0; }
 .section-alt { background: var(--bg-alt); }
+.section-gap-top { padding-top: 90px; }
 
 .hero-shell {
     position: relative;
@@ -614,6 +615,10 @@ ul, li { list-style: none; }
     background: rgba(63,160,122,0.18);
     border: 1px solid rgba(63,160,122,0.35);
 }
+.tool-icon i {
+    opacity: 0.9;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+}
 .tool-card--full .tool-icon {
     margin-bottom: 1rem;
 }
@@ -801,6 +806,13 @@ ul, li { list-style: none; }
     font-size: 0.9rem;
     color: var(--muted);
     margin-bottom: 1rem;
+}
+.cert-count {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: -0.4rem 0 0.9rem;
 }
 .cert-badges {
     display: grid;
