@@ -18,6 +18,10 @@
 
     <title>{% block title %}{{ site_profile.full_name|default:'Omar Atta' }} | {{ site_profile.hero_role|default:'Ingénieur Freelance' }} {{ site_profile.hero_highlight|default:'IA & Logiciel' }}{% endblock %}</title>
 
+    {% if site_profile.profile_photo %}
+    <link rel="preload" as="image" href="{{ site_profile.profile_photo.url }}">
+    {% endif %}
+
     <!-- Favicon -->
     <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
     <link rel="apple-touch-icon" href="{% static 'img/favicon.png' %}">
@@ -25,6 +29,8 @@
     <!-- Fonts — preconnect + une seule déclaration -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap"></noscript>
 
