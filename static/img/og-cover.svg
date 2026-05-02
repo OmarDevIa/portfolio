@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Omar Atta portfolio cover">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#132b3c"/>
+      <stop offset="50%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#e06a2f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="1030" cy="90" r="140" fill="#fff" opacity=".08"/>
+  <circle cx="160" cy="520" r="180" fill="#fff" opacity=".08"/>
+  <text x="90" y="210" fill="#fffaf2" font-family="Space Grotesk, Arial, sans-serif" font-size="74" font-weight="700">Omar Atta</text>
+  <text x="90" y="290" fill="#fffaf2" font-family="Manrope, Arial, sans-serif" font-size="38">Ingénieur logiciel, IA, mobile, AWS</text>
+  <text x="90" y="350" fill="#fffaf2" font-family="Manrope, Arial, sans-serif" font-size="32">Solutions intelligentes pour clients en Afrique et à l’international</text>
+  <rect x="90" y="420" width="480" height="72" rx="36" fill="#fffaf2" opacity=".14"/>
+  <text x="130" y="466" fill="#fffaf2" font-family="Manrope, Arial, sans-serif" font-size="30">IA • Logiciel métier • Mobile • Cloud AWS</text>
+</svg>

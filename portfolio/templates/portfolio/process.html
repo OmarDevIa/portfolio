@@ -1,0 +1,52 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}Processus — {{ site_profile.full_name }}{% endblock %}
+
+{% block content %}
+<section class="section-area" style="padding-top: 110px;">
+    <div class="container">
+        <div class="container-inner">
+            <div class="section-head text-center">
+                <p class="section-sub">Processus</p>
+                <h2 class="section-title">Mon processus en 4 étapes</h2>
+                <p class="section-desc">Une méthode claire, de la découverte à la livraison.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="process-card">
+                        <span class="process-num">01</span>
+                        <i class="fas fa-comments"></i>
+                        <h5>Découverte</h5>
+                        <p>Premier échange pour cadrer le besoin, le contexte et les objectifs.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="process-card">
+                        <span class="process-num">02</span>
+                        <i class="fas fa-drafting-compass"></i>
+                        <h5>Conception</h5>
+                        <p>Architecture, maquettes, planning et choix techniques prioritaires.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="process-card">
+                        <span class="process-num">03</span>
+                        <i class="fas fa-code"></i>
+                        <h5>Développement</h5>
+                        <p>Sprints agiles, démos régulières, livraison progressive.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="process-card">
+                        <span class="process-num">04</span>
+                        <i class="fas fa-rocket"></i>
+                        <h5>Livraison & suivi</h5>
+                        <p>Déploiement, passation et support post-livraison.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

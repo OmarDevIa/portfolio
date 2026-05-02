@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Badge IA">
+  <rect width="120" height="120" rx="24" fill="#0f766e"/>
+  <circle cx="60" cy="60" r="28" fill="none" stroke="#fff" stroke-width="8"/>
+  <circle cx="60" cy="60" r="8" fill="#fff"/>
+  <path d="M60 10v18M60 92v18M10 60h18M92 60h18M25 25l12 12M83 83l12 12M83 37l12-12M25 95l12-12" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+</svg>

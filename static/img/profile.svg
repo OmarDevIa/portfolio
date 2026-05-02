@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 960" role="img" aria-label="Portrait illustré Omar Atta">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#173f57"/>
+      <stop offset="100%" stop-color="#e06a2f"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="960" rx="48" fill="url(#bg)"/>
+  <circle cx="400" cy="320" r="150" fill="#f3d8bc"/>
+  <path d="M240 812c28-122 111-186 160-186s132 64 160 186" fill="#f7efe4" opacity=".95"/>
+  <path d="M270 300c16-118 98-173 130-173 93 0 153 71 142 188-33-21-58-32-77-32-74 0-91 67-185 17Z" fill="#0f2230"/>
+  <text x="400" y="890" fill="#fffaf2" font-family="Space Grotesk, Arial, sans-serif" font-size="42" text-anchor="middle">Omar Atta</text>
+</svg>

@@ -1,0 +1,290 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+{{ chart_month_labels|json_script:"chart-month-labels" }}
+{{ chart_message_totals|json_script:"chart-message-totals" }}
+{{ chart_testimonial_totals|json_script:"chart-testimonial-totals" }}
+{{ category_chart_labels|json_script:"category-chart-labels" }}
+{{ category_chart_totals|json_script:"category-chart-totals" }}
+{% endblock %}
+
+{% block content %}
+<div class="content-main">
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ project_count }}</h3>
+                    <p>Projets</p>
+                </div>
+                <div class="icon"><i class="fas fa-briefcase"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ featured_count }}</h3>
+                    <p>Projets en vitrine</p>
+                </div>
+                <div class="icon"><i class="fas fa-star"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ message_count }}</h3>
+                    <p>Messages reçus</p>
+                </div>
+                <div class="icon"><i class="fas fa-envelope-open-text"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ pending_testimonial_count }}</h3>
+                    <p>Témoignages à valider</p>
+                </div>
+                <div class="icon"><i class="fas fa-comment-dots"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card dashboard-panel h-100">
+                <div class="card-header">
+                    <h3 class="card-title">Acquisition & visibilité</h3>
+                </div>
+                <div class="card-body">
+                    <div class="dashboard-status-grid">
+                        <div class="dashboard-status-card {% if google_analytics_id %}is-live{% else %}is-idle{% endif %}">
+                            <span class="dashboard-status-label">Google Analytics</span>
+                            <strong>{% if google_analytics_id %}Actif{% else %}À configurer{% endif %}</strong>
+                            <p>{% if google_analytics_id %}Le tracking GA4 est injecté sur le site public.{% else %}Ajoutez GOOGLE_ANALYTICS_ID pour mesurer le trafic réel.{% endif %}</p>
+                        </div>
+                        <div class="dashboard-status-card {% if google_site_verification %}is-live{% else %}is-idle{% endif %}">
+                            <span class="dashboard-status-label">Search Console</span>
+                            <strong>{% if google_site_verification %}Prête{% else %}À connecter{% endif %}</strong>
+                            <p>{% if google_site_verification %}La balise de vérification est exposée dans le head du site.{% else %}Ajoutez GOOGLE_SITE_VERIFICATION pour valider votre domaine.{% endif %}</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-actions mt-3">
+                        {% if google_analytics_dashboard_url %}
+                        <a class="btn btn-warning" href="{{ google_analytics_dashboard_url }}" target="_blank" rel="noopener noreferrer">Ouvrir Google Analytics</a>
+                        {% endif %}
+                        <a class="btn btn-outline-secondary" href="/sitemap.xml" target="_blank" rel="noopener noreferrer">Voir le sitemap</a>
+                        <a class="btn btn-outline-secondary" href="/robots.txt" target="_blank" rel="noopener noreferrer">Voir robots.txt</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 mb-4">
+            <div class="card dashboard-panel h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Flux entrants sur 6 mois</h3>
+                    <span class="dashboard-kicker">Messages vs témoignages</span>
+                </div>
+                <div class="card-body">
+                    <canvas id="activityChart" height="110"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5 mb-4">
+            <div class="card dashboard-panel h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Répartition du portfolio</h3>
+                    <span class="dashboard-kicker">Catégories</span>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" height="210"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7 mb-4">
+            <div class="card dashboard-panel h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Pipeline admin</h3>
+                    <span class="dashboard-kicker">Priorités du moment</span>
+                </div>
+                <div class="card-body">
+                    <div class="dashboard-pipeline-grid">
+                        <div class="pipeline-card">
+                            <span>Messages non lus</span>
+                            <strong>{{ unread_message_count }}</strong>
+                            <p>À traiter rapidement pour ne pas perdre d’opportunités entrantes.</p>
+                        </div>
+                        <div class="pipeline-card">
+                            <span>Témoignages en attente</span>
+                            <strong>{{ pending_testimonial_count }}</strong>
+                            <p>À relire et publier pour renforcer la preuve sociale du site.</p>
+                        </div>
+                        <div class="pipeline-card">
+                            <span>Références visibles</span>
+                            <strong>{{ featured_count }}/{{ project_count }}</strong>
+                            <p>Projets actuellement utilisés comme vitrine premium sur la home.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-panel">
+                <div class="card-header">
+                    <h3 class="card-title">Messages récents</h3>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Sujet</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for message in recent_messages %}
+                            <tr>
+                                <td>{{ message.name }}</td>
+                                <td>{{ message.subject }}</td>
+                                <td>{% if message.is_read %}Lu{% else %}Nouveau{% endif %}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">Aucun message pour le moment.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card dashboard-panel">
+                <div class="card-header">
+                    <h3 class="card-title">Témoignages récents</h3>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Projet</th>
+                                <th>Visibilité</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for testimonial in recent_testimonials %}
+                            <tr>
+                                <td>{{ testimonial.author_name }}</td>
+                                <td>{{ testimonial.project|default:"-" }}</td>
+                                <td>{% if testimonial.is_visible %}Publié{% else %}En attente{% endif %}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">Aucun témoignage pour le moment.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card dashboard-panel">
+        <div class="card-header">
+            <h3 class="card-title">Actions rapides</h3>
+        </div>
+        <div class="card-body d-flex flex-wrap gap-2">
+            <a class="btn btn-warning" href="/admin/portfolio/project/">Gérer les projets</a>
+            <a class="btn btn-outline-secondary" href="/admin/portfolio/contactmessage/">Voir les messages non lus ({{ unread_message_count }})</a>
+            <a class="btn btn-outline-secondary" href="/admin/portfolio/testimonial/">Modérer les témoignages</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+    (() => {
+        const parse = (id) => JSON.parse(document.getElementById(id)?.textContent || '[]');
+        const monthLabels = parse('chart-month-labels');
+        const messageTotals = parse('chart-message-totals');
+        const testimonialTotals = parse('chart-testimonial-totals');
+        const categoryLabels = parse('category-chart-labels');
+        const categoryTotals = parse('category-chart-totals');
+
+        const lineContext = document.getElementById('activityChart');
+        if (lineContext) {
+            new Chart(lineContext, {
+                type: 'line',
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            label: 'Messages',
+                            data: messageTotals,
+                            borderColor: '#e06a2f',
+                            backgroundColor: 'rgba(224, 106, 47, 0.18)',
+                            tension: 0.35,
+                            fill: true,
+                        },
+                        {
+                            label: 'Témoignages',
+                            data: testimonialTotals,
+                            borderColor: '#0f766e',
+                            backgroundColor: 'rgba(15, 118, 110, 0.12)',
+                            tension: 0.35,
+                            fill: true,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
+        const doughnutContext = document.getElementById('categoryChart');
+        if (doughnutContext) {
+            new Chart(doughnutContext, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryTotals,
+                        backgroundColor: ['#e06a2f', '#0f766e', '#18232f', '#f5b041', '#6c757d'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                    }
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}Références — {{ site_profile.full_name }}{% endblock %}
+
+{% block content %}
+
+<!-- KPIs -->
+<section class="section-area" style="padding-top: 110px;">
+    <div class="container">
+        <div class="container-inner">
+            <div class="section-head text-center">
+                <p class="section-sub">Impact mesurable</p>
+                <h2 class="section-title">Des résultats, pas des promesses.</h2>
+                <p class="section-desc">Indicateurs issus de missions IA, automatisation et e-commerce livrées pour mes clients.</p>
+            </div>
+            <div class="row g-3">
+                {% for kpi in kpis %}
+                <div class="col-lg-3 col-md-6 col-6">
+                    <div class="kpi-card text-center">
+                        <strong class="kpi-value">{{ kpi.value }}</strong>
+                        <span class="kpi-label">{{ kpi.label }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TÉMOIGNAGES -->
+<section class="section-area section-alt">
+    <div class="container">
+        <div class="section-head text-center">
+            <p class="section-sub">Témoignages</p>
+            <h2 class="section-title">Ce que disent mes clients</h2>
+        </div>
+        <div class="row g-4">
+            {% for t in testimonials %}
+            <div class="col-lg-6">
+                <div class="testi-card">
+                    <div class="testi-top">
+                        {% if t.project %}
+                        <div class="testi-project-thumb">
+                            <img src="{{ t.project.thumbnail.url }}" alt="{{ t.project.title }}">
+                        </div>
+                        {% endif %}
+                        <div class="testi-stars">
+                            {% for i in "12345" %}
+                            <i class="fas {% if forloop.counter <= t.rating %}fa-star{% else %}fa-star opacity-30{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="testi-quote">"{{ t.content }}"</p>
+                    <div class="testi-author">
+                        {% if t.author_photo %}
+                        <img src="{{ t.author_photo.url }}" alt="{{ t.author_name }}" class="testi-avatar">
+                        {% else %}
+                        <div class="testi-avatar-placeholder">{{ t.author_name|first }}</div>
+                        {% endif %}
+                        <div>
+                            <strong>{{ t.author_name }}</strong>
+                            <span>{{ t.author_role }}{% if t.company_name %} · {{ t.company_name }}{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p style="color: var(--muted);">Aucun témoignage pour le moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FORMULAIRE AVIS CLIENT -->
+<section class="section-area">
+    <div class="container">
+        <div class="container-inner">
+            <div class="section-head text-center">
+                <p class="section-sub">Votre avis</p>
+                <h2 class="section-title">Laisser un témoignage</h2>
+                <p class="section-desc">Vous avez travaillé avec moi ? Partagez votre retour d'expérience. Il sera publié après validation.</p>
+            </div>
+            <div id="testiAlert" class="form-msg d-none"></div>
+            <form id="testimonialForm" action="{% url 'submit_testimonial' %}" method="post" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ testimonial_form.author_name }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ testimonial_form.author_email }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ testimonial_form.company_name }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ testimonial_form.author_role }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ testimonial_form.project }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ testimonial_form.rating }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            {{ testimonial_form.content }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn-main">
+                            Envoyer mon avis <i class="fas fa-paper-plane ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

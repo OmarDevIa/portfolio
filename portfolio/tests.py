@@ -1,0 +1,214 @@
+import json
+import tempfile
+
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import reverse
+
+from .models import ContactMessage, HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
+
+
+PNG_BYTES = (
+	b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
+	b'\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc```\x00\x00\x00\x04\x00\x01'
+	b'\x0b\xe7\x02\x9d\x00\x00\x00\x00IEND\xaeB`\x82'
+)
+
+VIDEO_BYTES = b'RIFF\x24\x00\x00\x00WEBMdemo-video-bytes'
+
+
+class PortfolioFlowTests(TestCase):
+	def setUp(self):
+		self.site_profile = SiteProfile.objects.create(
+			full_name='Omar Atta Dynamic',
+			brand_name='Omar.studio',
+			hero_badge_text='Open for premium missions',
+			hero_role='Architecte produit',
+			hero_highlight='IA, Apps & Cloud',
+			hero_description='Un profil entièrement piloté depuis l’admin.',
+			email='dynamic@example.com',
+			linkedin_url='https://www.linkedin.com/in/dynamic-omar',
+			whatsapp_url='https://wa.me/221000000000',
+		)
+		HeroSlide.objects.create(
+			eyebrow='09',
+			title='Slide administrable',
+			description='Ce contenu vient du back-office.',
+			icon='fas fa-sliders',
+			theme='teal',
+			order=1,
+		)
+		self.project = Project.objects.create(
+			title='Assistant virtuel bancaire',
+			slug='assistant-virtuel-bancaire',
+			category='ia',
+			short_description='Assistant IA multicanal pour support client.',
+			full_description='Une plateforme omnicanale pour automatiser le support.',
+			thumbnail=SimpleUploadedFile('thumb.png', PNG_BYTES, content_type='image/png'),
+			tags='Python,Django,AWS'
+		)
+
+	def test_home_page_loads(self):
+		response = self.client.get(reverse('home'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Dossiers visuels')
+		self.assertIn('category_groups', response.context)
+		self.assertContains(response, 'data-filter="ia"', html=False)
+		self.assertContains(response, 'portfolio-visual-row', html=False)
+		self.assertContains(response, 'project-browser-mockup', html=False)
+		self.assertContains(response, 'tech-badge', html=False)
+		self.assertContains(response, 'Omar Atta Dynamic')
+		self.assertContains(response, 'Slide administrable')
+		self.assertContains(response, 'dynamic@example.com')
+
+	def test_about_page_loads(self):
+		response = self.client.get(reverse('about'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'A propos')
+		self.assertContains(response, 'Omar Atta Dynamic')
+
+	def test_references_page_loads(self):
+		response = self.client.get(reverse('references'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'KPIs et retours clients')
+		self.assertContains(response, 'Impact mesurable')
+
+	def test_process_page_loads(self):
+		response = self.client.get(reverse('process'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Mon processus en 4 etapes')
+
+	def test_project_detail_page_uses_visual_showcase(self):
+		response = self.client.get(reverse('project_detail', args=[self.project.slug]))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'project-showcase-shell', html=False)
+		self.assertContains(response, 'Pourquoi ce projet compte')
+		self.assertContains(response, 'project-browser-mockup--detail', html=False)
+
+	def test_project_detail_prefers_uploaded_video_file(self):
+		self.project.demo_video_file = SimpleUploadedFile('demo.webm', VIDEO_BYTES, content_type='video/webm')
+		self.project.save(update_fields=['demo_video_file'])
+
+		response = self.client.get(reverse('project_detail', args=[self.project.slug]))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, '<video', html=False)
+		self.assertContains(response, '.webm')
+		self.assertNotContains(response, '<iframe', html=False)
+
+	def test_contact_form_persists_message(self):
+		response = self.client.post(
+			reverse('contact'),
+			{
+				'name': 'Client Afrique',
+				'email': 'client@example.com',
+				'subject': 'Mission IA',
+				'budget': '1500€ - 5000€',
+				'message': 'Nous voulons un assistant virtuel.'
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json'
+		)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(ContactMessage.objects.count(), 1)
+
+	def test_sitemap_lists_projects(self):
+		response = self.client.get(reverse('sitemap'))
+		self.assertEqual(response.status_code, 200)
+		self.assertIn('application/xml', response['Content-Type'])
+		self.assertContains(response, 'assistant-virtuel-bancaire')
+
+	def test_robots_txt_blocks_admin_and_media(self):
+		response = self.client.get(reverse('robots_txt'))
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response['Content-Type'], 'text/plain')
+		content = response.content.decode()
+		self.assertIn('Disallow: /admin/', content)
+		self.assertIn('Disallow: /media/', content)
+		self.assertIn('Sitemap:', content)
+
+	def test_home_seo_meta_tags_present(self):
+		response = self.client.get(reverse('home'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, '<meta name="description"', html=False)
+		self.assertContains(response, 'og:title', html=False)
+		self.assertContains(response, 'og:image', html=False)
+		self.assertContains(response, 'application/ld+json', html=False)
+		self.assertContains(response, 'rel="canonical"', html=False)
+
+	def test_project_detail_seo_uses_project_data(self):
+		response = self.client.get(reverse('project_detail', args=[self.project.slug]))
+		self.assertContains(response, 'Assistant virtuel bancaire')
+		self.assertContains(response, 'Assistant IA multicanal pour support client.')
+		self.assertContains(response, 'og:image', html=False)
+
+	def test_contact_form_invalid_returns_400(self):
+		response = self.client.post(
+			reverse('contact'),
+			{'name': '', 'email': 'pas-un-email', 'subject': '', 'message': ''},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json',
+		)
+		self.assertEqual(response.status_code, 400)
+		payload = json.loads(response.content)
+		self.assertEqual(payload['status'], 'error')
+		self.assertIn('email', payload['errors'])
+		self.assertEqual(ContactMessage.objects.count(), 0)
+
+	def test_contact_rate_limit_blocks_after_threshold(self):
+		cache.clear()
+		rate_key = 'contact_rate_1.2.3.4'
+		cache.set(rate_key, 3, timeout=3600)  # simuler 3 soumissions déjà faites
+		response = self.client.post(
+			reverse('contact'),
+			{'name': 'Test', 'email': 'test@example.com', 'subject': 'Sujet', 'message': 'Message.'},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json',
+			REMOTE_ADDR='1.2.3.4',
+		)
+		self.assertEqual(response.status_code, 429)
+		payload = json.loads(response.content)
+		self.assertEqual(payload['status'], 'error')
+
+	def test_testimonial_rating_out_of_range_rejected(self):
+		response = self.client.post(
+			reverse('submit_testimonial'),
+			{
+				'author_name': 'Test',
+				'author_email': 'test@example.com',
+				'author_role': 'CEO',
+				'rating': 99,
+				'content': 'Super mission.',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json',
+		)
+		self.assertEqual(response.status_code, 400)
+		self.assertEqual(Testimonial.objects.count(), 0)
+
+	def test_project_detail_404_on_unknown_slug(self):
+		response = self.client.get(reverse('project_detail', args=['slug-inexistant']))
+		self.assertEqual(response.status_code, 404)
+
+	def test_site_profile_cache_invalidated_on_save(self):
+		cache.clear()
+		self.site_profile.full_name = 'Omar Atta Updated'
+		self.site_profile.save()
+		response = self.client.get(reverse('home'))
+		self.assertContains(response, 'Omar Atta Updated')
+
+
+class SeedPortfolioCommandTests(TestCase):
+	def test_seed_portfolio_creates_showcase_data(self):
+		with tempfile.TemporaryDirectory() as media_root:
+			with override_settings(MEDIA_ROOT=media_root):
+				call_command('seed_portfolio')
+
+		self.assertGreaterEqual(Project.objects.count(), 5)
+		self.assertGreaterEqual(Service.objects.count(), 4)
+		self.assertGreaterEqual(Skill.objects.count(), 4)
+		self.assertGreaterEqual(Tool.objects.count(), 4)
+		self.assertGreaterEqual(KPI.objects.count(), 4)
+		self.assertGreaterEqual(Testimonial.objects.filter(is_visible=True).count(), 3)
