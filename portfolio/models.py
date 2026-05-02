@@ -136,7 +136,7 @@ class SiteProfile(models.Model):
     testimonials_section_subtitle = models.CharField(_('sous-titre temoignages'), max_length=120, default='Témoignages', blank=True)
     testimonials_section_title = models.CharField(_('titre temoignages'), max_length=160, default='Ce que disent mes clients', blank=True)
     contact_section_subtitle = models.CharField(_('sous-titre contact'), max_length=120, default='Contact', blank=True)
-    contact_section_title = models.CharField(_('titre contact'), max_length=160, default='Travaillons ensemble', blank=True)
+    contact_section_title = models.CharField(_('titre contact'), max_length=160, default='Obtenir un devis gratuit', blank=True)
 
     class Meta:
         verbose_name = _('profil du site')
@@ -166,6 +166,32 @@ class SiteProfile(models.Model):
 
     def get_tech_stack_items(self):
         return [item.strip() for item in self.tech_stack_marquee.split(',') if item.strip()]
+
+
+class CertificationBadge(models.Model):
+    site_profile = models.ForeignKey(
+        SiteProfile,
+        verbose_name=_('profil du site'),
+        on_delete=models.CASCADE,
+        related_name='certification_badges',
+    )
+    label = models.CharField(_('libellé'), max_length=120)
+    url = models.URLField(_('URL certification'), blank=True, default='')
+    badge_file = models.FileField(
+        _('badge'),
+        upload_to='profile/',
+        blank=True,
+        help_text=_('Image ou PDF du badge (jpg, png, pdf).'),
+    )
+    order = models.PositiveSmallIntegerField(_('ordre'), default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = _('badge de certification')
+        verbose_name_plural = _('badges de certification')
+
+    def __str__(self):
+        return self.label
 
 
 class HeroSlide(models.Model):
