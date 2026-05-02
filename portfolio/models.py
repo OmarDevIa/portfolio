@@ -189,7 +189,7 @@ class Skill(models.Model):
 
 class Tool(models.Model):
     icon = models.CharField(_('icône'), max_length=60)
-    icon_class = models.CharField(_('classe CSS'), max_length=40, help_text=_("Classe CSS couleur ex: icon-python"))
+    icon_class = models.CharField(_('classe CSS'), max_length=40, help_text=_('Couleur hexa ex: #3776ab'))
     title = models.CharField(_('titre'), max_length=80)
     description = models.TextField(_('description'))
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)

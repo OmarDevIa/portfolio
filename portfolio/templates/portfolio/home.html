@@ -156,62 +156,17 @@
                 Une vision plus visuelle de mon ecosysteme : chaque bloc combine un logo avec les plateformes que j'utilise au quotidien.
             </div>
             <div class="row g-4 tools-grid">
+                {% for tool in tools %}
                 <div class="col-lg-4 col-md-6">
                     <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-brands fa-python" style="color:#3776ab"></i></div>
-                        <h6>Python & IA</h6>
-                        <p>Flask, Django, FastAPI, TensorFlow, PyTorch</p>
+                        <div class="tool-icon">
+                            <i class="{{ tool.icon }}" style="color: {{ tool.icon_class|default:'#3fa07a' }}"></i>
+                        </div>
+                        <h6>{{ tool.title }}</h6>
+                        <p>{{ tool.description }}</p>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-brands fa-js" style="color:#f7df1e"></i></div>
-                        <h6>Front-End JS</h6>
-                        <p>TypeScript, React, Next.js, Angular, Vite</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-solid fa-server" style="color:#6b7280"></i></div>
-                        <h6>Back-End & APIs</h6>
-                        <p>Laravel, Symfony, Node.js, Express, REST</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-solid fa-mobile-screen-button" style="color:#6366f1"></i></div>
-                        <h6>Mobile & Cross-Platform</h6>
-                        <p>Flutter, Dart, Kotlin, Swift, Firebase</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-solid fa-store" style="color:#0ea5e9"></i></div>
-                        <h6>CMS & E-commerce</h6>
-                        <p>WordPress, Shopify, Strapi, Webflow</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-solid fa-database" style="color:#14b8a6"></i></div>
-                        <h6>Donnees & Bases</h6>
-                        <p>PostgreSQL, MySQL, SQLite, Prisma ORM</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-brands fa-docker" style="color:#2496ed"></i></div>
-                        <h6>DevOps & Containers</h6>
-                        <p>Docker, Kubernetes, CI/CD, Nginx</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="tool-card tool-card--full reveal">
-                        <div class="tool-icon"><i class="fa-solid fa-cloud" style="color:#0f766e"></i></div>
-                        <h6>Cloud & Collaboration</h6>
-                        <p>IBM Cloud, AWS, Render, Git & GitHub</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

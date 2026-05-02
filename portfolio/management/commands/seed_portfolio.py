@@ -107,10 +107,14 @@ SKILLS = [
 ]
 
 TOOLS = [
-    ('fab fa-python', 'icon-python', 'Python & Django', 'Socle principal pour applications métier, IA et APIs.', 1),
-    ('fab fa-aws', 'icon-aws', 'AWS', 'Compute, storage, déploiement et supervision cloud.', 2),
-    ('fas fa-bolt', 'icon-automation', 'Automatisation', 'Workflows, bots, intégrations et réduction des tâches répétitives.', 3),
-    ('fas fa-mobile-screen', 'icon-mobile', 'Flutter', 'Apps mobiles modernes pour Android et iOS.', 4),
+    ('fa-brands fa-python', '#3776ab', 'Python & IA', 'Flask, Django, FastAPI, TensorFlow, PyTorch', 1),
+    ('fa-brands fa-js', '#f7df1e', 'Front-End JS', 'TypeScript, React, Next.js, Angular, Vite', 2),
+    ('fa-solid fa-server', '#6b7280', 'Back-End & APIs', 'Laravel, Symfony, Node.js, Express, REST', 3),
+    ('fa-solid fa-mobile-screen-button', '#6366f1', 'Mobile & Cross-Platform', 'Flutter, Dart, Kotlin, Swift, Firebase', 4),
+    ('fa-solid fa-store', '#0ea5e9', 'CMS & E-commerce', 'WordPress, Shopify, Strapi, Webflow', 5),
+    ('fa-solid fa-database', '#14b8a6', 'Donnees & Bases', 'PostgreSQL, MySQL, SQLite, Prisma ORM', 6),
+    ('fa-brands fa-docker', '#2496ed', 'DevOps & Containers', 'Docker, Kubernetes, CI/CD, Nginx', 7),
+    ('fa-solid fa-cloud', '#0f766e', 'Cloud & Collaboration', 'IBM Cloud, AWS, Render, Git & GitHub', 8),
 ]
 
 KPIS = [
