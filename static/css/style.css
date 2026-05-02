@@ -495,6 +495,64 @@ ul, li { list-style: none; }
 
 .project-item.is-hidden { display: none; }
 
+/* ── TOOLS ── */
+.tools-grid { align-items: stretch; }
+.tools-intro {
+    max-width: 720px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+.tool-card {
+    height: 100%;
+    padding: 26px 20px;
+    background: var(--surface-glass);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    text-align: center;
+}
+.tool-card--full {
+    text-align: left;
+}
+.tool-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212,163,74,0.35);
+    box-shadow: var(--shadow-hover);
+}
+.tool-icon {
+    width: 58px; height: 58px;
+    border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1b1405;
+    background: rgba(212,163,74,0.18);
+    border: 1px solid rgba(212,163,74,0.35);
+}
+.tool-card--full .tool-icon {
+    margin-bottom: 1rem;
+}
+.tool-card--full h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+}
+.tool-card--full p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.tool-icon.icon-python { background: rgba(212,163,74,0.2); }
+.tool-icon.icon-aws { background: rgba(212,163,74,0.24); }
+.tool-icon.icon-automation { background: rgba(212,163,74,0.18); }
+.tool-icon.icon-mobile { background: rgba(212,163,74,0.2); }
+
 /* ── CONTACT ── */
 .contact-info-block { display: flex; flex-direction: column; gap: 1rem; }
 .contact-info-item {
