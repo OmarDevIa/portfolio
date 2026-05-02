@@ -14,7 +14,7 @@
 <div class="content-main">
     <div class="row">
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="small-box bg-warning">
+            <div class="small-box bg-warning admin-reveal">
                 <div class="inner">
                     <h3>{{ project_count }}</h3>
                     <p>Projets</p>
@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="small-box bg-info">
+            <div class="small-box bg-info admin-reveal">
                 <div class="inner">
                     <h3>{{ featured_count }}</h3>
                     <p>Projets en vitrine</p>
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="small-box bg-success">
+            <div class="small-box bg-success admin-reveal">
                 <div class="inner">
                     <h3>{{ message_count }}</h3>
                     <p>Messages reçus</p>
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-6 mb-4">
-            <div class="small-box bg-danger">
+            <div class="small-box bg-danger admin-reveal">
                 <div class="inner">
                     <h3>{{ pending_testimonial_count }}</h3>
                     <p>Témoignages à valider</p>
@@ -53,18 +53,18 @@
 
     <div class="row">
         <div class="col-lg-4 mb-4">
-            <div class="card dashboard-panel h-100">
+            <div class="card dashboard-panel h-100 admin-reveal">
                 <div class="card-header">
                     <h3 class="card-title">Acquisition & visibilité</h3>
                 </div>
                 <div class="card-body">
                     <div class="dashboard-status-grid">
-                        <div class="dashboard-status-card {% if google_analytics_id %}is-live{% else %}is-idle{% endif %}">
+                        <div class="dashboard-status-card admin-reveal {% if google_analytics_id %}is-live{% else %}is-idle{% endif %}">
                             <span class="dashboard-status-label">Google Analytics</span>
                             <strong>{% if google_analytics_id %}Actif{% else %}À configurer{% endif %}</strong>
                             <p>{% if google_analytics_id %}Le tracking GA4 est injecté sur le site public.{% else %}Ajoutez GOOGLE_ANALYTICS_ID pour mesurer le trafic réel.{% endif %}</p>
                         </div>
-                        <div class="dashboard-status-card {% if google_site_verification %}is-live{% else %}is-idle{% endif %}">
+                        <div class="dashboard-status-card admin-reveal {% if google_site_verification %}is-live{% else %}is-idle{% endif %}">
                             <span class="dashboard-status-label">Search Console</span>
                             <strong>{% if google_site_verification %}Prête{% else %}À connecter{% endif %}</strong>
                             <p>{% if google_site_verification %}La balise de vérification est exposée dans le head du site.{% else %}Ajoutez GOOGLE_SITE_VERIFICATION pour valider votre domaine.{% endif %}</p>
@@ -81,7 +81,7 @@
             </div>
         </div>
         <div class="col-lg-8 mb-4">
-            <div class="card dashboard-panel h-100">
+            <div class="card dashboard-panel h-100 admin-reveal">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">Flux entrants sur 6 mois</h3>
                     <span class="dashboard-kicker">Messages vs témoignages</span>
@@ -95,7 +95,7 @@
 
     <div class="row">
         <div class="col-lg-5 mb-4">
-            <div class="card dashboard-panel h-100">
+            <div class="card dashboard-panel h-100 admin-reveal">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">Répartition du portfolio</h3>
                     <span class="dashboard-kicker">Catégories</span>
@@ -106,24 +106,24 @@
             </div>
         </div>
         <div class="col-lg-7 mb-4">
-            <div class="card dashboard-panel h-100">
+            <div class="card dashboard-panel h-100 admin-reveal">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title mb-0">Pipeline admin</h3>
                     <span class="dashboard-kicker">Priorités du moment</span>
                 </div>
                 <div class="card-body">
                     <div class="dashboard-pipeline-grid">
-                        <div class="pipeline-card">
+                        <div class="pipeline-card admin-reveal">
                             <span>Messages non lus</span>
                             <strong>{{ unread_message_count }}</strong>
                             <p>À traiter rapidement pour ne pas perdre d’opportunités entrantes.</p>
                         </div>
-                        <div class="pipeline-card">
+                        <div class="pipeline-card admin-reveal">
                             <span>Témoignages en attente</span>
                             <strong>{{ pending_testimonial_count }}</strong>
                             <p>À relire et publier pour renforcer la preuve sociale du site.</p>
                         </div>
-                        <div class="pipeline-card">
+                        <div class="pipeline-card admin-reveal">
                             <span>Références visibles</span>
                             <strong>{{ featured_count }}/{{ project_count }}</strong>
                             <p>Projets actuellement utilisés comme vitrine premium sur la home.</p>
@@ -136,7 +136,7 @@
 
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <div class="card dashboard-panel">
+            <div class="card dashboard-panel admin-reveal">
                 <div class="card-header">
                     <h3 class="card-title">Messages récents</h3>
                 </div>
@@ -167,7 +167,7 @@
             </div>
         </div>
         <div class="col-lg-6 mb-4">
-            <div class="card dashboard-panel">
+            <div class="card dashboard-panel admin-reveal">
                 <div class="card-header">
                     <h3 class="card-title">Témoignages récents</h3>
                 </div>
@@ -199,7 +199,7 @@
         </div>
     </div>
 
-    <div class="card dashboard-panel">
+    <div class="card dashboard-panel admin-reveal">
         <div class="card-header">
             <h3 class="card-title">Actions rapides</h3>
         </div>
@@ -216,6 +216,18 @@
 {{ block.super }}
 <script>
     (() => {
+        const revealItems = document.querySelectorAll('.admin-reveal');
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (revealItems.length) {
+            if (prefersReduced) {
+                revealItems.forEach((el) => el.classList.add('is-visible'));
+            } else {
+                revealItems.forEach((el, index) => {
+                    window.setTimeout(() => el.classList.add('is-visible'), 70 * index);
+                });
+            }
+        }
+
         const parse = (id) => JSON.parse(document.getElementById(id)?.textContent || '[]');
         const monthLabels = parse('chart-month-labels');
         const messageTotals = parse('chart-message-totals');

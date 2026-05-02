@@ -298,6 +298,7 @@ a,
     border-radius: 16px;
     border: 1px solid rgba(24, 35, 47, 0.08);
     background: rgba(255, 255, 255, 0.48);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .dashboard-status-card strong,
@@ -326,6 +327,49 @@ a,
     display: flex;
     flex-wrap: wrap;
     gap: 0.55rem;
+}
+
+.dashboard-panel,
+.small-box {
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.dashboard-panel:hover,
+.small-box:hover,
+.pipeline-card:hover,
+.dashboard-status-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(224, 106, 47, 0.35);
+    box-shadow: 0 24px 50px rgba(46, 28, 15, 0.14);
+}
+
+.admin-reveal {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+    filter: blur(6px);
+    transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+    will-change: opacity, transform, filter;
+}
+
+.admin-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-reveal {
+        opacity: 1;
+        transform: none;
+        filter: none;
+        transition: none;
+    }
+    .dashboard-panel,
+    .small-box,
+    .pipeline-card,
+    .dashboard-status-card {
+        transition: none;
+    }
 }
 
 .main-footer {

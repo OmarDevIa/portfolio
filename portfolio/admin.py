@@ -33,11 +33,24 @@ def admin_dashboard_view(request):
     )
 
     category_labels = dict(Project.CATEGORY_CHOICES)
-    chart_month_labels = [item['month'].strftime('%b %Y') for item in monthly_messages]
+    message_lookup = {
+        item['month'].strftime('%Y-%m'): item['total']
+        for item in monthly_messages
+    }
     testimonial_lookup = {
         item['month'].strftime('%Y-%m'): item['total']
         for item in monthly_testimonials
     }
+
+    def add_months(dt, offset):
+        month = dt.month - 1 + offset
+        year = dt.year + month // 12
+        month = month % 12 + 1
+        return dt.replace(year=year, month=month, day=1)
+
+    month_anchor = today.replace(day=1)
+    month_keys = [add_months(month_anchor, -i).strftime('%Y-%m') for i in range(5, -1, -1)]
+    chart_month_labels = [add_months(month_anchor, -i).strftime('%b %Y') for i in range(5, -1, -1)]
 
     context = {
         **admin.site.each_context(request),
@@ -51,8 +64,8 @@ def admin_dashboard_view(request):
         'recent_messages': ContactMessage.objects.order_by('-received_at')[:5],
         'recent_testimonials': Testimonial.objects.order_by('-submitted_at')[:5],
         'chart_month_labels': chart_month_labels,
-        'chart_message_totals': [item['total'] for item in monthly_messages],
-        'chart_testimonial_totals': [testimonial_lookup.get(item['month'].strftime('%Y-%m'), 0) for item in monthly_messages],
+        'chart_message_totals': [message_lookup.get(key, 0) for key in month_keys],
+        'chart_testimonial_totals': [testimonial_lookup.get(key, 0) for key in month_keys],
         'category_chart_labels': [category_labels.get(item['category'], item['category']) for item in project_by_category],
         'category_chart_totals': [item['total'] for item in project_by_category],
         'google_analytics_dashboard_url': getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', ''),
