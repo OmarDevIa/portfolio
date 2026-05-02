@@ -144,10 +144,28 @@
         </div>
     </footer>
 
+    <div class="translate-widget" aria-label="Traduction">
+        <button class="translate-toggle" id="translateToggle" type="button" aria-expanded="false" aria-controls="translatePanel">
+            <i class="fas fa-language"></i>
+        </button>
+        <div class="translate-panel" id="translatePanel" aria-hidden="true">
+            <p class="translate-title">Traduire</p>
+            <div class="translate-actions">
+                <button type="button" data-lang="fr">Francais</button>
+                <button type="button" data-lang="en">English</button>
+                <button type="button" data-lang="ar">العربية</button>
+                <button type="button" data-lang="it">Italiano</button>
+                <button type="button" data-lang="tr">Turkce</button>
+            </div>
+            <div id="google_translate_element" class="translate-element" aria-hidden="true"></div>
+        </div>
+    </div>
+
     <a class="back-to-top" id="backToTop" href="#" aria-label="Haut"><i class="fas fa-arrow-up"></i></a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/script.js' %}"></script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate" async></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

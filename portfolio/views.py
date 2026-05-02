@@ -18,6 +18,13 @@ _TESTIMONIAL_RATE_WINDOW = 3600
 
 
 def _get_site_profile():
+    """
+    name : get_site_profile
+    description : Récupère le profil du site depuis le cache ou la base de données
+    author : Ingénieur Omar Atta
+    date : 2024-06-01
+    
+    """
     profile = cache.get('site_profile')
     if profile is None:
         profile = SiteProfile.objects.first() or SiteProfile()
@@ -26,6 +33,13 @@ def _get_site_profile():
 
 
 def _get_hero_slides():
+    """
+    name : get_hero_slides
+    description : Retourne les slides hero actifs ou des valeurs par defaut.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     slides = list(HeroSlide.objects.filter(is_active=True))
     if slides:
         return slides
@@ -37,6 +51,13 @@ def _get_hero_slides():
 
 
 def _build_seo_context(request, project=None):
+    """
+    name : build_seo_context
+    description : Construit le contexte SEO pour les pages du site.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     canonical_url = request.build_absolute_uri()
     seo_context = {
         'canonical_url': canonical_url,
@@ -53,12 +74,26 @@ def _build_seo_context(request, project=None):
 
 
 def _wants_json(request):
+    """
+    name : wants_json
+    description : Determine si la requete attend une reponse JSON.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     accept = request.headers.get('Accept', '')
     requested_with = request.headers.get('X-Requested-With', '')
     return 'application/json' in accept or requested_with == 'XMLHttpRequest'
 
 
 def _build_home_context(request, contact_form=None, testimonial_form=None):
+    """
+    name : build_home_context
+    description : Assemble toutes les donnees necessaires pour les pages publiques.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     site_profile = _get_site_profile()
     projects = Project.objects.all()
     category_groups = []
@@ -99,26 +134,61 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
 
 
 def home(request):
+    """
+    name : home
+    description : Affiche la page d'accueil.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     context = _build_home_context(request)
     return render(request, 'portfolio/home.html', context)
 
 
 def about(request):
+    """
+    name : about
+    description : Affiche la page a propos.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     context = _build_home_context(request)
     return render(request, 'portfolio/about.html', context)
 
 
 def references(request):
+    """
+    name : references
+    description : Affiche la page des references.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     context = _build_home_context(request)
     return render(request, 'portfolio/references.html', context)
 
 
 def process(request):
+    """
+    name : process
+    description : Affiche la page du processus.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     context = _build_home_context(request)
     return render(request, 'portfolio/process.html', context)
 
 
 def project_detail(request, slug):
+    """
+    name : project_detail
+    description : Affiche le detail d'un projet.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     project = get_object_or_404(Project, slug=slug)
     related = Project.objects.filter(category=project.category).exclude(pk=project.pk)[:3]
     context = {
@@ -133,6 +203,13 @@ def project_detail(request, slug):
 
 @require_POST
 def contact(request):
+    """
+    name : contact
+    description : Traite l'envoi du formulaire de contact.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
     rate_key = f'contact_rate_{ip}'
     try:
@@ -188,6 +265,13 @@ def contact(request):
 
 @require_POST
 def submit_testimonial(request):
+    """
+    name : submit_testimonial
+    description : Enregistre un avis client et applique un rate limit.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
     rate_key = f'testimonial_rate_{ip}'
     try:
@@ -227,6 +311,13 @@ def submit_testimonial(request):
 
 
 def robots_txt(request):
+    """
+    name : robots_txt
+    description : Fournit le fichier robots.txt du site.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     lines = [
         'User-agent: *',
         'Allow: /',
@@ -239,6 +330,13 @@ def robots_txt(request):
 
 
 def sitemap_images(request):
+    """
+    name : sitemap_images
+    description : Genere le sitemap XML des images de projets.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
     urlset = ET.Element(
         'urlset',
         {
