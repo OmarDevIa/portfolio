@@ -1,9 +1,14 @@
 from urllib.parse import urlparse
 
+from PIL import Image, UnidentifiedImageError
+
 from django.core.cache import cache
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator, MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.deconstruct import deconstructible
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 TECH_VISUALS = {
@@ -36,6 +41,27 @@ TECH_VISUALS = {
     'stripe api': ('fas fa-credit-card', 'tech-badge--shop'),
 }
 
+
+@deconstructible
+class FileSizeValidator:
+    def __init__(self, max_mb):
+        self.max_mb = max_mb
+        self.max_bytes = max_mb * 1024 * 1024
+
+    def __call__(self, file_obj):
+        if file_obj.size > self.max_bytes:
+            raise ValidationError(f'File exceeds {self.max_mb} MB limit.')
+
+
+def _validate_image_content(file_obj):
+    try:
+        file_obj.seek(0)
+        Image.open(file_obj).verify()
+    except (UnidentifiedImageError, OSError):
+        raise ValidationError('Invalid or corrupted image file.')
+    finally:
+        file_obj.seek(0)
+
 SIGNAL_VISUALS = {
     'ia': 'fas fa-brain',
     'mobile': 'fas fa-mobile-screen-button',
@@ -54,7 +80,7 @@ class SiteProfile(models.Model):
     hero_badge_text = models.CharField(_('badge hero'), max_length=120, default='Disponible pour missions')
     hero_role = models.CharField(_('rôle hero'), max_length=120, default='Ingénieur Freelance')
     hero_highlight = models.CharField(_('mise en avant hero'), max_length=180, default='IA, Logiciel, Mobile & Cloud AWS')
-    hero_description = models.TextField(
+    hero_description = CKEditor5Field(
         _('description hero'),
         default='Je conçois et mets en production des produits IA, applications métier, stacks cloud AWS et assistants virtuels pour startups, PME et équipes qui veulent livrer plus vite, mieux servir leurs clients et structurer leur croissance en Afrique et à l’international.',
     )
@@ -66,19 +92,41 @@ class SiteProfile(models.Model):
         _('photo de profil'),
         upload_to='profile/',
         blank=True,
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
+            FileSizeValidator(5),
+            _validate_image_content,
+        ],
         help_text='Image recommandee: 1200x1500 px minimum, ratio portrait 4:5, visage bien centre avec espace au-dessus de la tete.',
     )
-    about_photo = models.ImageField(_('photo à propos'), upload_to='profile/', blank=True)
+    about_photo = models.ImageField(
+        _('photo à propos'),
+        upload_to='profile/',
+        blank=True,
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
+            FileSizeValidator(5),
+            _validate_image_content,
+        ],
+    )
     about_title = models.CharField(_('titre à propos'), max_length=180, default='Ingénieur orienté business, livraison rapide et impact mesurable.')
-    about_intro = models.TextField(
+    about_intro = CKEditor5Field(
         _('introduction à propos'),
         default='Développeur full-stack spécialisé en IA, logiciels métier, applications mobiles, cloud AWS et automatisation, je transforme des besoins complexes en produits fiables, scalables et orientés retour sur investissement. Certifié IBM, j’interviens comme partenaire technique pour des entreprises en Afrique francophone, Europe et remote international.',
     )
-    about_body = models.TextField(
+    about_body = CKEditor5Field(
         _('texte à propos'),
         default='Mon approche est simple : comprendre le problème métier, sécuriser l’architecture, livrer vite et mesurer l’impact. J’accompagne aussi bien des lancements MVP que des plateformes critiques, assistants virtuels et systèmes intelligents connectés au cloud.',
     )
-    cv_file = models.FileField(_('CV'), upload_to='profile/', blank=True)
+    cv_file = models.FileField(
+        _('CV'),
+        upload_to='profile/',
+        blank=True,
+        validators=[
+            FileExtensionValidator(['pdf']),
+            FileSizeValidator(10),
+        ],
+    )
     footer_tagline = models.CharField(_('sous-titre footer'), max_length=160, default='Ingénieur Freelance IA & Logiciel')
     availability_text = models.CharField(_('texte de disponibilité'), max_length=180, default='Disponible pour nouvelles missions — Afrique & Remote')
     email = models.EmailField(_('email'), default='')
@@ -100,7 +148,7 @@ class SiteProfile(models.Model):
         default='Ma Certification Spécialisée en Developpement Logiciel && IA',
         blank=True,
     )
-    cert_section_desc = models.TextField(
+    cert_section_desc = CKEditor5Field(
         _('description certifications'),
         default='Mon expertise est prouvée et certifiée par IBM / Coursera.',
         blank=True,
@@ -115,12 +163,20 @@ class SiteProfile(models.Model):
         _('badge certification 1'),
         upload_to='profile/',
         blank=True,
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp', 'pdf']),
+            FileSizeValidator(5),
+        ],
         help_text=_('Image ou PDF du badge (jpg, png, pdf).'),
     )
     secondary_certificate_badge = models.FileField(
         _('badge certification 2'),
         upload_to='profile/',
         blank=True,
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp', 'pdf']),
+            FileSizeValidator(5),
+        ],
         help_text=_('Image ou PDF du badge (jpg, png, pdf).'),
     )
     services_section_subtitle = models.CharField(_('sous-titre services'), max_length=120, default='Services', blank=True)
@@ -129,10 +185,10 @@ class SiteProfile(models.Model):
     skills_section_title = models.CharField(_('titre competences'), max_length=120, default='Compétences', blank=True)
     tools_section_subtitle = models.CharField(_('sous-titre outils'), max_length=120, default='Outils & plateformes', blank=True)
     tools_section_title = models.CharField(_('titre outils'), max_length=120, default='Stack operationnelle', blank=True)
-    tools_section_desc = models.TextField(_('description outils'), default='Des outils robustes pour livrer vite, securiser l\'execution et scaler proprement.', blank=True)
-    tools_section_intro = models.TextField(_('intro outils'), default='Une vision plus visuelle de mon ecosysteme : chaque bloc combine un logo avec les plateformes que j\'utilise au quotidien.', blank=True)
+    tools_section_desc = CKEditor5Field(_('description outils'), default='Des outils robustes pour livrer vite, securiser l\'execution et scaler proprement.', blank=True)
+    tools_section_intro = CKEditor5Field(_('intro outils'), default='Une vision plus visuelle de mon ecosysteme : chaque bloc combine un logo avec les plateformes que j\'utilise au quotidien.', blank=True)
     portfolio_section_title = models.CharField(_('titre portfolio'), max_length=160, default='Projets & Réalisations', blank=True)
-    portfolio_section_desc = models.TextField(_('description portfolio'), default='Des projets concrets, orientés résultats et livrables mesurables.', blank=True)
+    portfolio_section_desc = CKEditor5Field(_('description portfolio'), default='Des projets concrets, orientés résultats et livrables mesurables.', blank=True)
     testimonials_section_subtitle = models.CharField(_('sous-titre temoignages'), max_length=120, default='Témoignages', blank=True)
     testimonials_section_title = models.CharField(_('titre temoignages'), max_length=160, default='Ce que disent mes clients', blank=True)
     contact_section_subtitle = models.CharField(_('sous-titre contact'), max_length=120, default='Contact', blank=True)
@@ -190,6 +246,10 @@ class CertificationBadge(models.Model):
         _('badge'),
         upload_to='profile/',
         blank=True,
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp', 'pdf']),
+            FileSizeValidator(5),
+        ],
         help_text=_('Image ou PDF du badge (jpg, png, pdf).'),
     )
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)
@@ -221,7 +281,7 @@ class HeroSlide(models.Model):
 
     eyebrow = models.CharField(_('sur-titre'), max_length=30, default='01')
     title = models.CharField(_('titre'), max_length=120)
-    description = models.TextField(_('description'))
+    description = CKEditor5Field(_('description'))
     icon = models.CharField(_('icône'), max_length=60, default='fas fa-sparkles')
     theme = models.CharField(_('thème'), max_length=20, choices=THEME_CHOICES, default='burnt')
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)
@@ -239,7 +299,7 @@ class HeroSlide(models.Model):
 class Service(models.Model):
     icon = models.CharField(_('icône'), max_length=60, help_text=_("Classe Font Awesome ex: fas fa-brain"))
     title = models.CharField(_('titre'), max_length=100)
-    description = models.TextField(_('description'))
+    description = CKEditor5Field(_('description'))
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)
 
     class Meta:
@@ -278,7 +338,7 @@ class Tool(models.Model):
     icon = models.CharField(_('icône'), max_length=60)
     icon_class = models.CharField(_('classe CSS'), max_length=40, help_text=_('Couleur hexa ex: #3776ab'))
     title = models.CharField(_('titre'), max_length=80)
-    description = models.TextField(_('description'))
+    description = CKEditor5Field(_('description'))
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)
 
     class Meta:
@@ -303,19 +363,28 @@ class Project(models.Model):
     slug = models.SlugField(_('slug'), unique=True)
     category = models.CharField(_('catégorie'), max_length=20, choices=CATEGORY_CHOICES, default='web')
     short_description = models.CharField(_('description courte'), max_length=200)
-    full_description = models.TextField(_('description complète'))
-    challenge = models.TextField(_('problème'), blank=True, help_text=_("Problème client résolu"))
-    solution = models.TextField(_('solution'), blank=True, help_text=_("Solution apportée"))
-    result = models.TextField(_('résultat'), blank=True, help_text=_("Résultat mesurable ex: +32% conversion"))
+    full_description = CKEditor5Field(_('description complète'))
+    challenge = CKEditor5Field(_('problème'), blank=True, help_text=_("Problème client résolu"))
+    solution = CKEditor5Field(_('solution'), blank=True, help_text=_("Solution apportée"))
+    result = CKEditor5Field(_('résultat'), blank=True, help_text=_("Résultat mesurable ex: +32% conversion"))
     thumbnail = models.ImageField(
         _('miniature'),
         upload_to='projects/thumbnails/',
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
+            FileSizeValidator(8),
+            _validate_image_content,
+        ],
         help_text=_("Image recommandée: 1600x1000 px minimum, ratio 16:10, cadrage horizontal propre."),
     )
     demo_video_file = models.FileField(
         _('fichier vidéo de démo'),
         upload_to='projects/videos/',
         blank=True,
+        validators=[
+            FileExtensionValidator(['mp4', 'webm', 'ogv', 'ogg']),
+            FileSizeValidator(50),
+        ],
         help_text=_("Vidéo démo uploadée directement (mp4, webm)")
     )
     live_url = models.URLField(_('URL live'), blank=True, help_text=_("Lien vers le projet en ligne"))
@@ -394,7 +463,16 @@ class Testimonial(models.Model):
     author_role = models.CharField(_('fonction'), max_length=150, help_text=_("ex: COO, RetailTech Paris"))
     author_email = models.EmailField(_('email'), blank=True)
     company_name = models.CharField(_('entreprise'), max_length=150, blank=True)
-    author_photo = models.ImageField(_('photo'), upload_to='avatars/', blank=True)
+    author_photo = models.ImageField(
+        _('photo'),
+        upload_to='avatars/',
+        blank=True,
+        validators=[
+            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
+            FileSizeValidator(3),
+            _validate_image_content,
+        ],
+    )
     content = models.TextField(_('contenu'))
     rating = models.PositiveSmallIntegerField(
         _('note'),

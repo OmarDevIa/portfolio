@@ -9,6 +9,14 @@ load_dotenv()
 def env_bool(name, default=False):
     return os.getenv(name, str(default)).strip().lower() in {'1', 'true', 'yes', 'on'}
 
+
+def _build_csrf_trusted_origins():
+    origins = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
+    site_url = os.getenv('SITE_URL', '').strip().rstrip('/')
+    if site_url.startswith('https://'):
+        origins.append(site_url)
+    return origins
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', '')
@@ -27,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
+    'django_ckeditor_5',
     'portfolio',
 ]
 
@@ -112,6 +121,18 @@ GITHUB_PROFILE_URL = os.getenv('GITHUB_PROFILE_URL', '').strip()
 GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '').strip()
 GOOGLE_ANALYTICS_DASHBOARD_URL = os.getenv('GOOGLE_ANALYTICS_DASHBOARD_URL', '').strip()
 GOOGLE_SITE_VERIFICATION = os.getenv('GOOGLE_SITE_VERIFICATION', '').strip()
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'underline', 'link',
+            'bulletedList', 'numberedList', 'blockQuote', '|',
+            'undo', 'redo', 'removeFormat',
+        ],
+        'height': 180,
+        'width': '100%',
+    }
+}
 
 JAZZMIN_SETTINGS = {
     'site_title': 'Omar.tech Admin',
@@ -199,6 +220,14 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
     SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    CSRF_TRUSTED_ORIGINS = _build_csrf_trusted_origins()
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'

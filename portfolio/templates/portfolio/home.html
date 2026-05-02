@@ -65,7 +65,7 @@
                     <div class="avail-badge">
                         <i class="fas fa-circle"></i> {{ site_profile.hero_badge_text }}
                     </div>
-                    <p class="about-desc">{{ site_profile.hero_description }}</p>
+                    <div class="about-desc">{{ site_profile.hero_description|safe }}</div>
                     <div class="about-btns">
                         <a href="#contact" class="btn-main">Me contacter</a>
                         <a href="{% if site_profile.cv_file %}{{ site_profile.cv_file.url }}{% else %}{% static 'img/cv.pdf' %}{% endif %}"
@@ -84,7 +84,7 @@
                                 <span class="hero-slide-icon"><i class="{{ slide.icon }}"></i></span>
                             </div>
                             <h3 class="hero-slide-title">{{ slide.title }}</h3>
-                            <p class="hero-slide-desc">{{ slide.description }}</p>
+                            <p class="hero-slide-desc">{{ slide.description|striptags }}</p>
                         </article>
                         {% endfor %}
                     </div>
@@ -114,7 +114,7 @@
                     <div class="service-item reveal">
                         <i class="{{ service.icon }}"></i>
                         <h4>{{ service.title }}</h4>
-                        <p>{{ service.description }}</p>
+                        <p>{{ service.description|striptags }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -171,10 +171,10 @@
             <div class="section-head text-center">
                 <p class="section-sub">{{ site_profile.tools_section_subtitle }}</p>
                 <h2 class="section-title title-reveal reveal">{{ site_profile.tools_section_title }}</h2>
-                <p class="section-desc">{{ site_profile.tools_section_desc }}</p>
+                <div class="section-desc">{{ site_profile.tools_section_desc|safe }}</div>
             </div>
             <div class="tools-intro reveal">
-                {{ site_profile.tools_section_intro }}
+                {{ site_profile.tools_section_intro|safe }}
             </div>
             <div class="row g-4 tools-grid">
                 {% for tool in tools %}
@@ -184,7 +184,7 @@
                             <i class="{{ tool.icon }}" style="color: {{ tool.icon_class|default:'#3fa07a' }}"></i>
                         </div>
                         <h6>{{ tool.title }}</h6>
-                        <p>{{ tool.description }}</p>
+                        <p>{{ tool.description|striptags }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -206,7 +206,7 @@
         <div class="container-inner">
             <div class="section-head text-center">
                 <h2 class="section-title title-reveal reveal">{{ site_profile.portfolio_section_title }}</h2>
-                <p class="section-desc">{{ site_profile.portfolio_section_desc }}</p>
+                <div class="section-desc">{{ site_profile.portfolio_section_desc|safe }}</div>
             </div>
             <ul class="project-filter">
                 <li data-filter="all" class="active">Tous</li>
@@ -232,7 +232,7 @@
                             <h3><a href="{% url 'project_detail' project.slug %}">{{ project.title }}</a></h3>
                             <p class="project-short-desc">{{ project.short_description }}</p>
                             {% if project.result %}
-                            <p class="project-result"><i class="fas fa-chart-line me-1"></i>{{ project.result }}</p>
+                            <p class="project-result"><i class="fas fa-chart-line me-1"></i>{{ project.result|striptags }}</p>
                             {% endif %}
                             <!-- Tags tech -->
                             <div class="project-tags-row">

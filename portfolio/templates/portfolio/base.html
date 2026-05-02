@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% block meta_description %}{{ site_profile.hero_description|default:"Omar Atta — Ingénieur Freelance IA, Web & Mobile." }}{% endblock %}">
+    <meta name="description" content="{% block meta_description %}{{ site_profile.hero_description|striptags|default:"Omar Atta — Ingénieur Freelance IA, Web & Mobile." }}{% endblock %}">
     <meta name="robots" content="index, follow">
     <meta name="author" content="{{ site_profile.full_name|default:'Omar Atta' }}">
     <link rel="canonical" href="{% block canonical %}{{ canonical_url|default:site_url }}{% endblock %}">
@@ -56,7 +56,7 @@
         "@type": "Person",
         "name": "{{ site_profile.full_name|default:'Omar Atta' }}",
         "jobTitle": "{{ site_profile.hero_role|default:'Ingénieur Freelance' }} {{ site_profile.hero_highlight|default:'IA & Logiciel' }}",
-        "description": "{{ site_profile.hero_description|default:'Ingénieur freelance spécialisé IA, Web & Mobile.'|escapejs }}",
+        "description": "{{ site_profile.hero_description|striptags|default:'Ingénieur freelance spécialisé IA, Web & Mobile.'|escapejs }}",
         "url": "{{ canonical_url|default:site_url }}",
         "email": "mailto:{{ site_profile.email|default:'' }}",
         "sameAs": [

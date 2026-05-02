@@ -46,7 +46,7 @@
 
                     {% if project.result %}
                     <div class="pd-result">
-                        <i class="fas fa-chart-line"></i> {{ project.result }}
+                        <i class="fas fa-chart-line"></i> {{ project.result|striptags }}
                     </div>
                     {% endif %}
 
@@ -129,7 +129,7 @@
                     <!-- Description -->
                     <div class="pd-section">
                         <h3 class="pd-section-title"><i class="fas fa-info-circle"></i> À propos du projet</h3>
-                        <div class="pd-body-text">{{ project.full_description|linebreaks }}</div>
+                        <div class="pd-body-text">{{ project.full_description|safe }}</div>
                     </div>
 
                     <!-- Challenge / Solution / Résultat -->
@@ -142,7 +142,7 @@
                                 <div class="pd-csr pd-csr--challenge">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     <h6>Problème</h6>
-                                    <p>{{ project.challenge }}</p>
+                                    <p>{{ project.challenge|safe }}</p>
                                 </div>
                             </div>
                             {% endif %}
@@ -151,7 +151,7 @@
                                 <div class="pd-csr pd-csr--solution">
                                     <i class="fas fa-lightbulb"></i>
                                     <h6>Solution</h6>
-                                    <p>{{ project.solution }}</p>
+                                    <p>{{ project.solution|safe }}</p>
                                 </div>
                             </div>
                             {% endif %}
@@ -160,7 +160,7 @@
                                 <div class="pd-csr pd-csr--result">
                                     <i class="fas fa-chart-line"></i>
                                     <h6>Résultat</h6>
-                                    <p>{{ project.result }}</p>
+                                    <p>{{ project.result|safe }}</p>
                                 </div>
                             </div>
                             {% endif %}

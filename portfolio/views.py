@@ -1,3 +1,5 @@
+import xml.etree.ElementTree as ET
+
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
@@ -11,6 +13,8 @@ from .forms import ContactForm, TestimonialForm
 
 _CONTACT_RATE_LIMIT = 3  # max submissions per window
 _CONTACT_RATE_WINDOW = 3600  # 1 hour in seconds
+_TESTIMONIAL_RATE_LIMIT = 3
+_TESTIMONIAL_RATE_WINDOW = 3600
 
 
 def _get_site_profile():
@@ -184,6 +188,21 @@ def contact(request):
 
 @require_POST
 def submit_testimonial(request):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', '')).split(',')[0].strip()
+    rate_key = f'testimonial_rate_{ip}'
+    try:
+        submissions = cache.get_or_set(rate_key, 0, timeout=_TESTIMONIAL_RATE_WINDOW)
+        if submissions >= _TESTIMONIAL_RATE_LIMIT:
+            msg = 'Trop de tentatives. Réessayez dans une heure.'
+            if _wants_json(request):
+                return JsonResponse({'status': 'error', 'message': msg}, status=429)
+            context = _build_home_context(request)
+            context['testimonial_error_message'] = msg
+            return render(request, 'portfolio/home.html', context, status=429)
+    except Exception:
+        submissions = 0
+        rate_key = None
+
     form = TestimonialForm(request.POST, request.FILES)
     if form.is_valid():
         form.save()
@@ -193,6 +212,8 @@ def submit_testimonial(request):
                 'status': 'ok',
                 'message': response_message
             })
+        if rate_key:
+            cache.set(rate_key, submissions + 1, timeout=_TESTIMONIAL_RATE_WINDOW)
         context = _build_home_context(request, testimonial_form=TestimonialForm())
         context['testimonial_success_message'] = response_message
         return render(request, 'portfolio/home.html', context)
@@ -212,5 +233,28 @@ def robots_txt(request):
         'Disallow: /admin/',
         'Disallow: /media/',
         f'Sitemap: {request.build_absolute_uri(reverse("sitemap"))}',
+        f'Sitemap: {request.build_absolute_uri(reverse("sitemap_images"))}',
     ]
     return HttpResponse('\n'.join(lines), content_type='text/plain')
+
+
+def sitemap_images(request):
+    urlset = ET.Element(
+        'urlset',
+        {
+            'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9',
+            'xmlns:image': 'http://www.google.com/schemas/sitemap-image/1.1',
+        },
+    )
+    for project in Project.objects.exclude(thumbnail=''):
+        url = ET.SubElement(urlset, 'url')
+        loc = ET.SubElement(url, 'loc')
+        loc.text = request.build_absolute_uri(project.get_absolute_url())
+        image = ET.SubElement(url, 'image:image')
+        image_loc = ET.SubElement(image, 'image:loc')
+        image_loc.text = request.build_absolute_uri(project.thumbnail.url)
+        image_title = ET.SubElement(image, 'image:title')
+        image_title.text = project.title
+
+    xml_bytes = ET.tostring(urlset, encoding='utf-8', xml_declaration=True)
+    return HttpResponse(xml_bytes, content_type='application/xml')
