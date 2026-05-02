@@ -8,7 +8,7 @@
 <!-- KPIs -->
 <section class="section-area" style="padding-top: 110px;">
     <div class="container">
-        <div class="container-inner">
+        <div class="container-inner reveal">
             <div class="section-head text-center">
                 <p class="section-sub">Impact mesurable</p>
                 <h2 class="section-title">Des résultats, pas des promesses.</h2>
@@ -17,7 +17,7 @@
             <div class="row g-3">
                 {% for kpi in kpis %}
                 <div class="col-lg-3 col-md-6 col-6">
-                    <div class="kpi-card text-center">
+                    <div class="kpi-card text-center reveal">
                         <strong class="kpi-value">{{ kpi.value }}</strong>
                         <span class="kpi-label">{{ kpi.label }}</span>
                     </div>
@@ -38,7 +38,7 @@
         <div class="row g-4">
             {% for t in testimonials %}
             <div class="col-lg-6">
-                <div class="testi-card">
+                <div class="testi-card reveal">
                     <div class="testi-top">
                         {% if t.project %}
                         <div class="testi-project-thumb">
@@ -77,7 +77,7 @@
 <!-- FORMULAIRE AVIS CLIENT -->
 <section class="section-area">
     <div class="container">
-        <div class="container-inner">
+        <div class="container-inner reveal">
             <div class="section-head text-center">
                 <p class="section-sub">Votre avis</p>
                 <h2 class="section-title">Laisser un témoignage</h2>

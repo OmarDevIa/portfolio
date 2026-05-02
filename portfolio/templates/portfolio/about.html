@@ -9,7 +9,7 @@
         <div class="row g-4">
             <!-- Sidebar -->
             <div class="col-lg-3">
-                <div class="profile-card text-center">
+                <div class="profile-card text-center reveal">
                     {% if site_profile.about_photo %}
                     <img src="{{ site_profile.about_photo.url }}" alt="{{ site_profile.full_name }}" class="profile-photo">
                     {% elif site_profile.profile_photo %}
@@ -38,14 +38,14 @@
 
             <!-- Contenu -->
             <div class="col-lg-9">
-                <div class="about-content">
+                <div class="about-content reveal">
                     <p class="section-sub">À propos</p>
                     <h1 class="about-title">{{ site_profile.about_title }}</h1>
                     <p class="about-desc">{{ site_profile.about_intro }}</p>
                     <p class="about-desc">{{ site_profile.about_body }}</p>
 
                     <!-- Stats -->
-                    <div class="about-stats">
+                    <div class="about-stats reveal">
                         <div class="about-stat-item">
                             <strong>{{ site_profile.years_experience }}+</strong>
                             <span>{{ site_profile.experience_label }}</span>
@@ -61,7 +61,7 @@
                     </div>
 
                     <!-- Certifications -->
-                    <div class="cert-list">
+                    <div class="cert-list reveal">
                         <a href="{{ site_profile.primary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-item">
                             <img src="{% static 'img/ibm.svg' %}" alt="IBM">
                             <span>{{ site_profile.primary_certificate_label }}</span>
