@@ -23,6 +23,10 @@
 {% block og_title %}{{ project.title }} | Omar Atta{% endblock %}
 {% block og_description %}{{ project.short_description }}{% endblock %}
 {% block og_image %}{{ project_og_image_url|default:project.thumbnail.url }}{% endblock %}
+{% block og_image_alt %}{{ project.title }} — {{ project.get_category_display }}{% endblock %}
+{% block twitter_title %}{{ project.title }} | Omar Atta{% endblock %}
+{% block twitter_description %}{{ project.short_description }}{% endblock %}
+{% block twitter_image %}{{ project_og_image_url|default:project.thumbnail.url }}{% endblock %}
 
 {% block content %}
 <div style="padding-top: 80px;">

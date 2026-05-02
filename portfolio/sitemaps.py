@@ -9,7 +9,7 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return ['home']
+        return ['home', 'about', 'process', 'references']
 
     def location(self, item):
         return reverse(item)
