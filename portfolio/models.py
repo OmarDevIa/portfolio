@@ -94,6 +94,49 @@ class SiteProfile(models.Model):
     primary_certificate_url = models.URLField(_('URL certification 1'), blank=True, default='https://www.credly.com/badges/84bc6f03-87d3-4fc6-b3dd-c67a48f70d2a/public_url')
     secondary_certificate_label = models.CharField(_('libellé certification 2'), max_length=120, default='IBM Applied AI')
     secondary_certificate_url = models.URLField(_('URL certification 2'), blank=True, default='https://www.credly.com/badges/b5b05f89-e8e7-48a4-b96d-f73b05b33f1f/public_url')
+    cert_section_title = models.CharField(
+        _('titre certifications'),
+        max_length=180,
+        default='Ma Certification Spécialisée en Developpement Logiciel && IA',
+        blank=True,
+    )
+    cert_section_desc = models.TextField(
+        _('description certifications'),
+        default='Mon expertise est prouvée et certifiée par IBM / Coursera.',
+        blank=True,
+    )
+    cert_section_note = models.CharField(
+        _('note certifications'),
+        max_length=180,
+        default='Cliquez sur le badge pour vérifier la certification sur Credly.',
+        blank=True,
+    )
+    primary_certificate_badge = models.FileField(
+        _('badge certification 1'),
+        upload_to='profile/',
+        blank=True,
+        help_text=_('Image ou PDF du badge (jpg, png, pdf).'),
+    )
+    secondary_certificate_badge = models.FileField(
+        _('badge certification 2'),
+        upload_to='profile/',
+        blank=True,
+        help_text=_('Image ou PDF du badge (jpg, png, pdf).'),
+    )
+    services_section_subtitle = models.CharField(_('sous-titre services'), max_length=120, default='Services', blank=True)
+    services_section_title = models.CharField(_('titre services'), max_length=120, default='Ce que je fais', blank=True)
+    skills_section_subtitle = models.CharField(_('sous-titre competences'), max_length=120, default='Stack technique', blank=True)
+    skills_section_title = models.CharField(_('titre competences'), max_length=120, default='Compétences', blank=True)
+    tools_section_subtitle = models.CharField(_('sous-titre outils'), max_length=120, default='Outils & plateformes', blank=True)
+    tools_section_title = models.CharField(_('titre outils'), max_length=120, default='Stack operationnelle', blank=True)
+    tools_section_desc = models.TextField(_('description outils'), default='Des outils robustes pour livrer vite, securiser l\'execution et scaler proprement.', blank=True)
+    tools_section_intro = models.TextField(_('intro outils'), default='Une vision plus visuelle de mon ecosysteme : chaque bloc combine un logo avec les plateformes que j\'utilise au quotidien.', blank=True)
+    portfolio_section_title = models.CharField(_('titre portfolio'), max_length=160, default='Projets & Réalisations', blank=True)
+    portfolio_section_desc = models.TextField(_('description portfolio'), default='Des projets concrets, orientés résultats et livrables mesurables.', blank=True)
+    testimonials_section_subtitle = models.CharField(_('sous-titre temoignages'), max_length=120, default='Témoignages', blank=True)
+    testimonials_section_title = models.CharField(_('titre temoignages'), max_length=160, default='Ce que disent mes clients', blank=True)
+    contact_section_subtitle = models.CharField(_('sous-titre contact'), max_length=120, default='Contact', blank=True)
+    contact_section_title = models.CharField(_('titre contact'), max_length=160, default='Travaillons ensemble', blank=True)
 
     class Meta:
         verbose_name = _('profil du site')

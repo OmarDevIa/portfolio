@@ -137,7 +137,22 @@ class SiteProfileAdmin(admin.ModelAdmin):
             'fields': ('about_title', 'about_intro', 'about_body', 'tech_stack_marquee')
         }),
         ('Preuves & badges', {
-            'fields': ('primary_badge_text', 'secondary_badge_text', 'secondary_badge_icon', 'primary_certificate_label', 'primary_certificate_url', 'secondary_certificate_label', 'secondary_certificate_url')
+            'fields': (
+                'primary_badge_text', 'secondary_badge_text', 'secondary_badge_icon',
+                'cert_section_title', 'cert_section_desc', 'cert_section_note',
+                'primary_certificate_label', 'primary_certificate_url', 'primary_certificate_badge',
+                'secondary_certificate_label', 'secondary_certificate_url', 'secondary_certificate_badge',
+            )
+        }),
+        ('Sections home', {
+            'fields': (
+                'services_section_subtitle', 'services_section_title',
+                'skills_section_subtitle', 'skills_section_title',
+                'tools_section_subtitle', 'tools_section_title', 'tools_section_desc', 'tools_section_intro',
+                'portfolio_section_title', 'portfolio_section_desc',
+                'testimonials_section_subtitle', 'testimonials_section_title',
+                'contact_section_subtitle', 'contact_section_title',
+            )
         }),
         ('Contacts', {
             'fields': ('email', 'whatsapp_url', 'linkedin_url', 'github_url', 'footer_tagline')

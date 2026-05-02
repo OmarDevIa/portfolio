@@ -61,15 +61,40 @@
                     </div>
 
                     <!-- Certifications -->
-                    <div class="cert-list reveal">
-                        <a href="{{ site_profile.primary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-item">
-                            <img src="{% static 'img/ibm.svg' %}" alt="IBM">
-                            <span>{{ site_profile.primary_certificate_label }}</span>
-                        </a>
-                        <a href="{{ site_profile.secondary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-item">
-                            <img src="{% static 'img/ia.svg' %}" alt="IBM AI">
-                            <span>{{ site_profile.secondary_certificate_label }}</span>
-                        </a>
+                    <div class="cert-panel reveal">
+                        <h3 class="cert-title">{{ site_profile.cert_section_title }}</h3>
+                        <p class="cert-desc">{{ site_profile.cert_section_desc }}</p>
+                        <div class="cert-badges">
+                            <a href="{{ site_profile.primary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-badge">
+                                {% if site_profile.primary_certificate_badge %}
+                                    {% with badge_url=site_profile.primary_certificate_badge.url %}
+                                        {% if badge_url|lower|slice:"-4:" == ".pdf" %}
+                                            <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                        {% else %}
+                                            <img src="{{ site_profile.primary_certificate_badge.url }}" alt="{{ site_profile.primary_certificate_label }}">
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <img src="{% static 'img/ibm.svg' %}" alt="IBM">
+                                {% endif %}
+                                <span>{{ site_profile.primary_certificate_label }}</span>
+                            </a>
+                            <a href="{{ site_profile.secondary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-badge">
+                                {% if site_profile.secondary_certificate_badge %}
+                                    {% with badge_url=site_profile.secondary_certificate_badge.url %}
+                                        {% if badge_url|lower|slice:"-4:" == ".pdf" %}
+                                            <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                        {% else %}
+                                            <img src="{{ site_profile.secondary_certificate_badge.url }}" alt="{{ site_profile.secondary_certificate_label }}">
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <img src="{% static 'img/ia.svg' %}" alt="IBM AI">
+                                {% endif %}
+                                <span>{{ site_profile.secondary_certificate_label }}</span>
+                            </a>
+                        </div>
+                        <p class="cert-note">{{ site_profile.cert_section_note }}</p>
                     </div>
 
                     <div class="about-btns mt-4">
