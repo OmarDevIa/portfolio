@@ -65,11 +65,14 @@
                         <h3 class="cert-title">{{ site_profile.cert_section_title }}</h3>
                         <p class="cert-desc">{{ site_profile.cert_section_desc }}</p>
                         <div class="cert-badges">
+                            {% if site_profile.primary_certificate_label %}
                             <a href="{{ site_profile.primary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-badge">
                                 {% if site_profile.primary_certificate_badge %}
                                     {% with badge_url=site_profile.primary_certificate_badge.url %}
                                         {% if badge_url|lower|slice:"-4:" == ".pdf" %}
-                                            <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                            <object class="cert-pdf" data="{{ site_profile.primary_certificate_badge.url }}" type="application/pdf">
+                                                <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                            </object>
                                         {% else %}
                                             <img src="{{ site_profile.primary_certificate_badge.url }}" alt="{{ site_profile.primary_certificate_label }}">
                                         {% endif %}
@@ -79,11 +82,15 @@
                                 {% endif %}
                                 <span>{{ site_profile.primary_certificate_label }}</span>
                             </a>
+                            {% endif %}
+                            {% if site_profile.secondary_certificate_label %}
                             <a href="{{ site_profile.secondary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-badge">
                                 {% if site_profile.secondary_certificate_badge %}
                                     {% with badge_url=site_profile.secondary_certificate_badge.url %}
                                         {% if badge_url|lower|slice:"-4:" == ".pdf" %}
-                                            <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                            <object class="cert-pdf" data="{{ site_profile.secondary_certificate_badge.url }}" type="application/pdf">
+                                                <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                            </object>
                                         {% else %}
                                             <img src="{{ site_profile.secondary_certificate_badge.url }}" alt="{{ site_profile.secondary_certificate_label }}">
                                         {% endif %}
@@ -93,6 +100,25 @@
                                 {% endif %}
                                 <span>{{ site_profile.secondary_certificate_label }}</span>
                             </a>
+                            {% endif %}
+                            {% for badge in site_profile.certification_badges.all %}
+                            <a href="{{ badge.url }}" target="_blank" rel="noopener noreferrer" class="cert-badge">
+                                {% if badge.badge_file %}
+                                    {% with badge_url=badge.badge_file.url %}
+                                        {% if badge_url|lower|slice:"-4:" == ".pdf" %}
+                                            <object class="cert-pdf" data="{{ badge.badge_file.url }}" type="application/pdf">
+                                                <span class="cert-file"><i class="fas fa-file-pdf"></i></span>
+                                            </object>
+                                        {% else %}
+                                            <img src="{{ badge.badge_file.url }}" alt="{{ badge.label }}">
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <span class="cert-file"><i class="fas fa-award"></i></span>
+                                {% endif %}
+                                <span>{{ badge.label }}</span>
+                            </a>
+                            {% endfor %}
                         </div>
                         <p class="cert-note">{{ site_profile.cert_section_note }}</p>
                     </div>
