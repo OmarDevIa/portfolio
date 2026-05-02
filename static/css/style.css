@@ -535,7 +535,7 @@ ul, li { list-style: none; }
 .tool-card--full .tool-icon {
     margin-bottom: 1rem;
 }
-.tool-card--full h4 {
+.tool-card--full h6 {
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 0.6rem;
