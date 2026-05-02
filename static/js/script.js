@@ -17,21 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Intersection Observer pour animate-up
-    const animItems = document.querySelectorAll('.animate-up');
-    if (animItems.length) {
-        const obs = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.style.animationPlayState = 'running';
-                    obs.unobserve(e.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        animItems.forEach(el => {
-            el.style.animationPlayState = 'paused';
-            obs.observe(el);
-        });
+    // Intersection Observer pour reveals modernes
+    const revealItems = document.querySelectorAll('.reveal, .animate-up, .animate-fadein');
+    if (revealItems.length) {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReduced) {
+            revealItems.forEach(el => el.classList.add('is-visible'));
+        } else {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+            revealItems.forEach(el => obs.observe(el));
+        }
     }
 
     // Nav toggle mobile
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     if (themeToggle) {
-        applyTheme(localStorage.getItem('portfolio-theme') || 'day');
+        applyTheme(localStorage.getItem('portfolio-theme') || 'night');
         themeToggle.addEventListener('click', () => {
             applyTheme(document.body.getAttribute('data-theme') === 'night' ? 'day' : 'night');
         });
