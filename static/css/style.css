@@ -943,6 +943,214 @@ ul, li { list-style: none; }
 .translate-actions button:hover { border-color: var(--accent); color: var(--accent); transform: translateX(2px); }
 .translate-element { display: none; }
 
+/* ── ANIMATIONS PROFESSIONNELLES 2026 ── */
+
+/* Magnetic hover effect for buttons */
+.btn-main, .btn-outline, .hire-btn {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
+}
+
+.btn-main::before, .btn-outline::before, .hire-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s var(--ease-smooth), height 0.6s var(--ease-smooth);
+}
+
+.btn-main:hover::before, .btn-outline:hover::before, .hire-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Shimmer effect for cards */
+.service-item::after, .project-item-card::after, .tool-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(63, 160, 122, 0.08),
+        transparent
+    );
+    transform: skewX(-25deg);
+    transition: left 0.7s var(--ease-smooth);
+    pointer-events: none;
+}
+
+.service-item:hover::after, .project-item-card:hover::after, .tool-card:hover::after {
+    left: 150%;
+}
+
+.service-item, .project-item-card, .tool-card {
+    position: relative;
+}
+
+/* Floating animation for hero elements */
+@keyframes floatY {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes floatX {
+    0%, 100% { transform: translateX(0px); }
+    50% { transform: translateX(8px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+/* Gradient border animation */
+.animated-border {
+    position: relative;
+    background: var(--surface-glass);
+    border-radius: var(--radius);
+}
+
+.animated-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: calc(var(--radius) + 2px);
+    background: linear-gradient(45deg, var(--accent), #e06a2f, var(--accent));
+    background-size: 200% 200%;
+    animation: shimmer 3s linear infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-smooth);
+}
+
+.animated-border:hover::before {
+    opacity: 1;
+}
+
+/* Staggered animation delays */
+.animate-up:nth-child(1) { animation-delay: 0ms; }
+.animate-up:nth-child(2) { animation-delay: 100ms; }
+.animate-up:nth-child(3) { animation-delay: 200ms; }
+.animate-up:nth-child(4) { animation-delay: 300ms; }
+.animate-up:nth-child(5) { animation-delay: 400ms; }
+.animate-up:nth-child(6) { animation-delay: 500ms; }
+
+/* Smooth parallax on scroll */
+.parallax-element {
+    transition: transform 0.1s linear;
+    will-change: transform;
+}
+
+/* Typewriter effect for hero */
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+.typewriter {
+    overflow: hidden;
+    border-right: 2px solid var(--accent);
+    white-space: nowrap;
+    animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+}
+
+/* Skeleton loading */
+@keyframes skeleton {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--surface) 0px,
+        rgba(63, 160, 122, 0.1) 40px,
+        var(--surface) 80px
+    );
+    background-size: 200px 100%;
+    animation: skeleton 1.5s ease-in-out infinite;
+}
+
+/* Particle effect background */
+.particle-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+}
+
+/* Glass morphism enhancement */
+.glass-enhanced {
+    background: var(--surface-glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        var(--shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Neon glow effect */
+.neon-text {
+    text-shadow: 
+        0 0 7px var(--accent),
+        0 0 10px var(--accent),
+        0 0 21px var(--accent),
+        0 0 42px rgba(63, 160, 122, 0.5);
+}
+
+.neon-border {
+    box-shadow: 
+        0 0 5px var(--accent),
+        0 0 10px var(--accent),
+        inset 0 0 5px rgba(63, 160, 122, 0.1);
+}
+
+/* Scroll progress indicator */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #e06a2f);
+    z-index: 9999;
+    transition: width 0.1s linear;
+}
+
+/* 3D tilt effect on hover */
+.tilt-card {
+    transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
+    transform-style: preserve-3d;
+}
+
+.tilt-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 991px) {
     .main-nav { display: none; flex-direction: column; width: 100%; padding: 0.8rem 0; }
@@ -952,6 +1160,11 @@ ul, li { list-style: none; }
     .hire-btn { display: none; }
     .profile-card { position: static; }
     .about-area { padding-top: 100px; }
+    
+    /* Disable heavy animations on mobile */
+    .tilt-card:hover {
+        transform: none;
+    }
 }
 
 @media (max-width: 767px) {
@@ -964,6 +1177,12 @@ ul, li { list-style: none; }
     .footer-links { justify-content: center; }
     .about-btns { flex-direction: column; }
     .btn-main, .btn-outline { justify-content: center; }
+    
+    /* Reduce animations for accessibility */
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* ── ABOUT STATS ── */

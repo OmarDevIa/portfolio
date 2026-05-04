@@ -58,16 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Theme
+    // Theme - Dark mode par défaut
     const applyTheme = (theme) => {
         document.body.setAttribute('data-theme', theme);
         localStorage.setItem('portfolio-theme', theme);
         if (themeToggle) {
-            themeToggle.innerHTML = theme === 'night' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            themeToggle.innerHTML = theme === 'night' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         }
     };
     const storedTheme = localStorage.getItem('portfolio-theme');
-    applyTheme(storedTheme || 'night');
+    applyTheme(storedTheme || 'night'); // Dark mode par défaut
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             applyTheme(document.body.getAttribute('data-theme') === 'night' ? 'day' : 'night');
