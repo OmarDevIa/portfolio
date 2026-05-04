@@ -300,6 +300,22 @@ class Service(models.Model):
     icon = models.CharField(_('icône'), max_length=60, help_text=_("Classe Font Awesome ex: fas fa-brain"))
     title = models.CharField(_('titre'), max_length=100)
     description = CKEditor5Field(_('description'))
+    slug = models.SlugField(_('slug'), max_length=140, unique=True, blank=True, null=True)
+    summary = models.TextField(_('résumé'), blank=True)
+    full_description = CKEditor5Field(_('description détaillée'), blank=True)
+    detail_points = models.TextField(
+        _('points clés'),
+        blank=True,
+        help_text=_('Un point par ligne pour affichage en liste.'),
+    )
+    cover_image = models.ImageField(_('image principale'), upload_to='services/', blank=True)
+    secondary_image = models.ImageField(_('image secondaire'), upload_to='services/', blank=True)
+    demo_video_file = models.FileField(
+        _('vidéo démonstration'),
+        upload_to='services/',
+        blank=True,
+        validators=[FileExtensionValidator(['mp4', 'webm', 'ogg'])],
+    )
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)
 
     class Meta:
@@ -309,6 +325,13 @@ class Service(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def has_video(self):
+        return bool(self.demo_video_file)
+
+    def get_detail_points(self):
+        return [line.strip() for line in self.detail_points.splitlines() if line.strip()]
 
 
 class Skill(models.Model):

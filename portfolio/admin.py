@@ -177,8 +177,20 @@ class SkillAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display  = ('title', 'order')
+    list_display  = ('title', 'slug', 'order')
     list_editable = ('order',)
+    prepopulated_fields = {'slug': ('title',)}
+    fieldsets = (
+        ('Identité', {
+            'fields': ('title', 'slug', 'icon', 'order')
+        }),
+        ('Contenu', {
+            'fields': ('description', 'summary', 'full_description', 'detail_points')
+        }),
+        ('Médias', {
+            'fields': ('cover_image', 'secondary_image', 'demo_video_file')
+        }),
+    )
 
 
 @admin.register(Tool)

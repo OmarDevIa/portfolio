@@ -1,0 +1,84 @@
+{% extends 'portfolio/base.html' %}
+{% load static %}
+
+{% block title %}{{ service.title }} | {{ site_profile.full_name|default:'Omar Atta' }}{% endblock %}
+{% block meta_description %}{{ service.summary|default:service.description|striptags|truncatewords:26 }}{% endblock %}
+{% block og_title %}{{ service.title }} | {{ site_profile.full_name|default:'Omar Atta' }}{% endblock %}
+{% block og_description %}{{ service.summary|default:service.description|striptags|truncatewords:26 }}{% endblock %}
+{% block og_image %}{{ service_og_image_url|default:site_url }}/static/img/og-cover.png{% endblock %}
+
+{% block content %}
+<section class="service-detail-hero">
+    <div class="container">
+        <a href="{% url 'home' %}#services" class="back-link">
+            <i class="fas fa-arrow-left me-2"></i>Retour aux services
+        </a>
+        <div class="service-detail-header">
+            <span class="service-detail-icon"><i class="{{ service.icon }}"></i></span>
+            <div>
+                <h1 class="service-detail-title">{{ service.title }}</h1>
+                {% if service.summary %}
+                <p class="service-detail-summary">{{ service.summary }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="service-detail-content">
+    <div class="container">
+        <div class="service-detail-layout">
+            <div class="service-detail-main">
+                {% if service.cover_image or service.secondary_image %}
+                <div class="service-media-grid">
+                    {% if service.cover_image %}
+                    <div class="service-media-card">
+                        <img src="{{ service.cover_image.url }}" alt="{{ service.title }}" loading="lazy" decoding="async">
+                    </div>
+                    {% endif %}
+                    {% if service.secondary_image %}
+                    <div class="service-media-card">
+                        <img src="{{ service.secondary_image.url }}" alt="{{ service.title }}" loading="lazy" decoding="async">
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if service.has_video %}
+                <div class="service-video-block">
+                    <video controls playsinline preload="metadata" class="service-video-player">
+                        <source src="{{ service.demo_video_file.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                </div>
+                {% endif %}
+
+                <div class="service-detail-text">
+                    {% if service.full_description %}
+                    {{ service.full_description|safe }}
+                    {% else %}
+                    {{ service.description|safe }}
+                    {% endif %}
+                </div>
+            </div>
+            <aside class="service-detail-aside">
+                <div class="service-detail-card">
+                    <h3>Ce que vous obtenez</h3>
+                    {% if service.detail_points %}
+                    <ul class="service-detail-points">
+                        {% for point in service.get_detail_points %}
+                        <li><i class="fas fa-check"></i>{{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>Un livrable clair, une exécution rapide et un suivi professionnel.</p>
+                    {% endif %}
+                    <a href="{% url 'home' %}#contact" class="btn-primary-custom w-100 text-center">
+                        <i class="fas fa-rocket me-2"></i>Obtenir un devis gratuit
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

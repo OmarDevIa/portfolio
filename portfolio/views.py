@@ -50,7 +50,7 @@ def _get_hero_slides():
     ]
 
 
-def _build_seo_context(request, project=None):
+def _build_seo_context(request, project=None, service=None):
     """
     name : build_seo_context
     description : Construit le contexte SEO pour les pages du site.
@@ -70,6 +70,8 @@ def _build_seo_context(request, project=None):
     }
     if project and getattr(project, 'thumbnail', None):
         seo_context['project_og_image_url'] = request.build_absolute_uri(project.thumbnail.url)
+    if service and getattr(service, 'cover_image', None):
+        seo_context['service_og_image_url'] = request.build_absolute_uri(service.cover_image.url)
     return seo_context
 
 
@@ -199,6 +201,23 @@ def project_detail(request, slug):
     }
     context.update(_build_seo_context(request, project=project))
     return render(request, 'portfolio/project_detail.html', context)
+
+
+def service_detail(request, slug):
+    """
+    name : service_detail
+    description : Affiche le detail d'un service.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    service = get_object_or_404(Service, slug=slug)
+    context = {
+        'service': service,
+        'site_profile': _get_site_profile(),
+    }
+    context.update(_build_seo_context(request, service=service))
+    return render(request, 'portfolio/service_detail.html', context)
 
 
 @require_POST

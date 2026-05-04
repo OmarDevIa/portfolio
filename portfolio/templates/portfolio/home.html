@@ -115,6 +115,7 @@
                         <i class="{{ service.icon }}"></i>
                         <h4>{{ service.title }}</h4>
                         <p>{{ service.description|striptags }}</p>
+                        <a href="{% url 'service_detail' service.slug %}" class="service-link">Voir le service</a>
                     </div>
                 </div>
                 {% endfor %}

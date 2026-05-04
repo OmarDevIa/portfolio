@@ -52,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Nav toggle mobile
     if (navToggle && mainNav) {
-        navToggle.addEventListener('click', () => mainNav.classList.toggle('open'));
+        navToggle.addEventListener('click', () => {
+            const isOpen = mainNav.classList.toggle('open');
+            navToggle.classList.toggle('is-open', isOpen);
+        });
     }
 
     // Theme
@@ -63,8 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
             themeToggle.innerHTML = theme === 'night' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         }
     };
+    const storedTheme = localStorage.getItem('portfolio-theme');
+    applyTheme(storedTheme || 'night');
     if (themeToggle) {
-        applyTheme(localStorage.getItem('portfolio-theme') || 'night');
         themeToggle.addEventListener('click', () => {
             applyTheme(document.body.getAttribute('data-theme') === 'night' ? 'day' : 'night');
         });
@@ -76,6 +80,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (header) header.classList.toggle('scrolled', y > 20);
         if (backToTop) backToTop.classList.toggle('visible', y > 400);
     }, { passive: true });
+
+    const scrollToHash = (hash) => {
+        if (!hash) return;
+        const target = document.querySelector(hash);
+        if (!target) return;
+        const offset = (header?.offsetHeight || 0) + 12;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+    };
+
+    document.querySelectorAll('a[href*="#"]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            const url = new URL(link.href, window.location.origin);
+            if (url.pathname !== window.location.pathname || !url.hash) return;
+            event.preventDefault();
+            if (mainNav) mainNav.classList.remove('open');
+            if (navToggle) navToggle.classList.remove('is-open');
+            scrollToHash(url.hash);
+            history.replaceState(null, '', url.hash);
+        });
+    });
+
+    if (window.location.hash) {
+        window.setTimeout(() => scrollToHash(window.location.hash), 120);
+    }
 
     // Project filter
     const filterBtns = document.querySelectorAll('.project-filter li');
