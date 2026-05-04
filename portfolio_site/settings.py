@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     'portfolio',
 ]
 
+# Content Security Policy
+if not DEBUG:
+    INSTALLED_APPS.append('csp')
+
 if importlib.util.find_spec('jazzmin') is not None:
     INSTALLED_APPS.insert(0, 'jazzmin')
 
@@ -121,6 +125,24 @@ GITHUB_PROFILE_URL = os.getenv('GITHUB_PROFILE_URL', '').strip()
 GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '').strip()
 GOOGLE_ANALYTICS_DASHBOARD_URL = os.getenv('GOOGLE_ANALYTICS_DASHBOARD_URL', '').strip()
 GOOGLE_SITE_VERIFICATION = os.getenv('GOOGLE_SITE_VERIFICATION', '').strip()
+
+# Sentry - Error tracking and monitoring
+SENTRY_DSN = os.getenv('SENTRY_DSN', '').strip()
+SENTRY_ENVIRONMENT = os.getenv('SENTRY_ENVIRONMENT', 'production' if not DEBUG else 'development').strip()
+SENTRY_TRACES_SAMPLE_RATE = float(os.getenv('SENTRY_TRACES_SAMPLE_RATE', '0.1'))
+
+if SENTRY_DSN and not DEBUG:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        environment=SENTRY_ENVIRONMENT,
+        traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
+        profiles_sample_rate=0.1,
+        send_default_pii=False,
+        integrations=[
+            # Django integration is auto-detected
+        ],
+    )
 
 CKEDITOR_5_CONFIGS = {
     'default': {
@@ -231,3 +253,53 @@ if not DEBUG:
     CSRF_COOKIE_SAMESITE = 'Lax'
     CSRF_TRUSTED_ORIGINS = _build_csrf_trusted_origins()
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+    # Content Security Policy
+    CSP_DEFAULT_SRC = ("'self'",)
+    CSP_SCRIPT_SRC = (
+        "'self'",
+        "'unsafe-inline'",  # Required for some Django features
+        "'unsafe-eval'",    # Required for some third-party scripts
+        'https://cdn.jsdelivr.net',
+        'https://cdnjs.cloudflare.com',
+        'https://www.googletagmanager.com',
+        'https://www.google.com',
+        'https://www.gstatic.com',
+    )
+    CSP_STYLE_SRC = (
+        "'self'",
+        "'unsafe-inline'",  # Required for Bootstrap and custom styles
+        'https://cdn.jsdelivr.net',
+        'https://cdnjs.cloudflare.com',
+        'https://fonts.googleapis.com',
+    )
+    CSP_FONT_SRC = (
+        "'self'",
+        'https://cdn.jsdelivr.net',
+        'https://cdnjs.cloudflare.com',
+        'https://fonts.gstatic.com',
+    )
+    CSP_IMG_SRC = (
+        "'self'",
+        'data:',
+        'blob:',
+        'https:',
+    )
+    CSP_CONNECT_SRC = (
+        "'self'",
+        'https://www.google-analytics.com',
+        'https://stats.g.doubleclick.net',
+        'https://translate.google.com',
+    )
+    CSP_FRAME_SRC = (
+        "'self'",
+        'https://www.google.com',
+        'https://translate.google.com',
+    )
+    CSP_OBJECT_SRC = ("'none'",)
+    CSP_MEDIA_SRC = ("'self'", 'blob:')
+    CSP_FRAME_ANCESTORS = ("'none'",)
+    CSP_BASE_URI = ("'self'",)
+    CSP_FORM_ACTION = ("'self'",)
+    CSP_REPORT_URI = ('/csp-report/',)
+    CSP_REPORT_ONLY = False  # Set to True initially to test without blocking

@@ -213,3 +213,100 @@ class SeedPortfolioCommandTests(TestCase):
 		self.assertGreaterEqual(Tool.objects.count(), 4)
 		self.assertGreaterEqual(KPI.objects.count(), 4)
 		self.assertGreaterEqual(Testimonial.objects.filter(is_visible=True).count(), 3)
+
+
+class PWATests(TestCase):
+	"""Tests pour la Progressive Web App"""
+	
+	def test_manifest_json_file_exists(self):
+		"""Le fichier manifest.json existe dans le système de fichiers"""
+		import os
+		from django.conf import settings
+		manifest_path = os.path.join(settings.STATICFILES_DIRS[0], 'manifest.json')
+		self.assertTrue(os.path.exists(manifest_path))
+		
+	def test_manifest_json_content(self):
+		"""Le manifest contient les champs obligatoires"""
+		import os
+		import json
+		from django.conf import settings
+		manifest_path = os.path.join(settings.STATICFILES_DIRS[0], 'manifest.json')
+		
+		with open(manifest_path, 'r') as f:
+			manifest = json.load(f)
+		
+		self.assertIn('name', manifest)
+		self.assertIn('short_name', manifest)
+		self.assertIn('start_url', manifest)
+		self.assertIn('display', manifest)
+		self.assertIn('icons', manifest)
+		
+	def test_service_worker_file_exists(self):
+		"""Le fichier service worker existe dans le système de fichiers"""
+		import os
+		from django.conf import settings
+		sw_path = os.path.join(settings.STATICFILES_DIRS[0], 'js', 'sw.js')
+		self.assertTrue(os.path.exists(sw_path))
+		
+	def test_service_worker_content(self):
+		"""Le service worker contient le code nécessaire"""
+		import os
+		from django.conf import settings
+		sw_path = os.path.join(settings.STATICFILES_DIRS[0], 'js', 'sw.js')
+		
+		with open(sw_path, 'r', encoding='utf-8') as f:
+			content = f.read()
+		
+		# Vérifier les fonctionnalités clés du service worker
+		self.assertIn('addEventListener', content)
+		self.assertIn('fetch', content)
+		self.assertIn('caches', content)
+		
+	def test_home_page_template_includes_pwa_setup(self):
+		"""Le template de base inclut la configuration PWA"""
+		from django.template import Template, Context
+		from django.template.loader import get_template
+		
+		template = get_template('portfolio/base.html')
+		content = template.template.source
+		
+		# Vérifier que le manifest est référencé
+		self.assertIn('manifest.json', content)
+		# Vérifier que le service worker est enregistré
+		self.assertIn('serviceWorker', content)
+		# Vérifier les meta tags Apple
+		self.assertIn('apple-mobile-web-app', content)
+
+
+class CSPReportTests(TestCase):
+	"""Tests pour le endpoint CSP report"""
+	
+	def test_csp_report_accepts_post(self):
+		"""Le endpoint CSP report accepte les POST"""
+		csp_data = {
+			'csp-report': {
+				'document-uri': 'https://example.com/',
+				'violated-directive': "script-src 'self'",
+				'blocked-uri': 'https://malicious.com/script.js',
+			}
+		}
+		response = self.client.post(
+			reverse('csp_report'),
+			data=json.dumps(csp_data),
+			content_type='application/csp-report'
+		)
+		self.assertEqual(response.status_code, 204)
+		
+	def test_csp_report_rejects_get(self):
+		"""Le endpoint CSP report rejette les GET"""
+		response = self.client.get(reverse('csp_report'))
+		self.assertEqual(response.status_code, 405)
+		
+	def test_csp_report_handles_invalid_json(self):
+		"""Le endpoint gère les JSON invalides"""
+		response = self.client.post(
+			reverse('csp_report'),
+			data='invalid json',
+			content_type='application/csp-report'
+		)
+		self.assertEqual(response.status_code, 400)

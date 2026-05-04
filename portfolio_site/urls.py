@@ -19,6 +19,7 @@ urlpatterns = [
     path('sitemap-images.xml', portfolio_views.sitemap_images, name='sitemap_images'),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('robots.txt', portfolio_views.robots_txt, name='robots_txt'),
+    path('csp-report/', portfolio_views.csp_report, name='csp_report'),
     path('', include('portfolio.urls')),
 ]
 

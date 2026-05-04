@@ -1,12 +1,18 @@
 import xml.etree.ElementTree as ET
 
+import json
+import logging
+
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+
+logger = logging.getLogger(__name__)
 
 from .models import HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
 from .forms import ContactForm, TestimonialForm
@@ -67,6 +73,9 @@ def _build_seo_context(request, project=None, service=None):
         'google_analytics_id': getattr(settings, 'GOOGLE_ANALYTICS_ID', ''),
         'google_analytics_dashboard_url': getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', ''),
         'google_site_verification': getattr(settings, 'GOOGLE_SITE_VERIFICATION', ''),
+        # Sentry monitoring context
+        'sentry_dsn': getattr(settings, 'SENTRY_DSN', ''),
+        'sentry_environment': getattr(settings, 'SENTRY_ENVIRONMENT', 'production'),
     }
     if project and getattr(project, 'thumbnail', None):
         seo_context['project_og_image_url'] = request.build_absolute_uri(project.thumbnail.url)
@@ -459,3 +468,38 @@ def server_error(request):
         "Une erreur interne est survenue. Reessayez plus tard.",
     )
     return render(request, '500.html', context, status=500)
+
+
+@csrf_exempt
+def csp_report(request):
+    """
+    name : csp_report
+    description : Reçoit et logge les rapports de violation CSP.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    if request.method == 'POST':
+        try:
+            # CSP reports can be in different formats
+            if request.content_type == 'application/csp-report':
+                body = json.loads(request.body)
+            else:
+                body = json.loads(request.body)
+
+            # Log the violation
+            csp_report_data = body.get('csp-report', body)
+            logger.warning(
+                f"CSP Violation: {csp_report_data.get('blocked-uri', 'unknown')} "
+                f"on {csp_report_data.get('document-uri', 'unknown')} "
+                f"violating {csp_report_data.get('violated-directive', 'unknown')}"
+            )
+
+            # In production, you might want to store these in a database
+            # or send them to a monitoring service like Sentry
+            return HttpResponse(status=204)
+        except (json.JSONDecodeError, KeyError) as e:
+            logger.error(f"Invalid CSP report: {e}")
+            return HttpResponse(status=400)
+
+    return HttpResponse(status=405)

@@ -1,0 +1,27 @@
+{
+  "name": "Omar Atta - Ingénieur Freelance IA & Logiciel",
+  "short_name": "Omar.tech",
+  "description": "Portfolio professionnel - Solutions IA, Web & Mobile livrées clé en main — Afrique & Remote",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0c",
+  "theme_color": "#3fa07a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "technology"],
+  "lang": "fr",
+  "dir": "ltr"
+}

@@ -34,6 +34,12 @@
     <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
     <link rel="apple-touch-icon" href="{% static 'img/favicon.png' %}">
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Omar.tech">
+
     <!-- Fonts — preconnect + une seule déclaration -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -91,6 +97,45 @@
 
     {% block extra_head %}{% endblock %}
     {% block schema_org %}{% endblock %}
+
+    <!-- Sentry Browser SDK -->
+    {% if sentry_dsn %}
+    <script
+      src="https://js.sentry-cdn.com/{{ sentry_dsn|slice:'8:'|slice:':-1' }}.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      Sentry.init({
+        dsn: '{{ sentry_dsn }}',
+        environment: '{{ sentry_environment|default:"production" }}',
+        integrations: [
+          Sentry.browserTracingIntegration(),
+          Sentry.replayIntegration({
+            maskAllText: true,
+            blockAllMedia: true,
+          }),
+        ],
+        tracesSampleRate: 0.1,
+        replaysSessionSampleRate: 0.1,
+        replaysOnErrorSampleRate: 1.0,
+        beforeSend(event, hint) {
+          // Check if error is from a browser extension or other irrelevant source
+          if (event.exception) {
+            const error = hint.originalException || hint.syntheticException;
+            if (error && error.message && (
+              error.message.includes('extension://') ||
+              error.message.includes('chrome-extension://') ||
+              error.message.includes('Non-Error promise rejection captured')
+            )) {
+              return null;
+            }
+          }
+          return event;
+        },
+      });
+    </script>
+    {% endif %}
+
     {% if google_analytics_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
     <script>
@@ -166,5 +211,20 @@
     <script src="{% static 'js/script.js' %}"></script>
     <script src="https://translate.google.com/translate_a/element.js?cb=initGoogleTranslate" async></script>
     {% block extra_js %}{% endblock %}
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{% static "js/sw.js" %}')
+                    .then((registration) => {
+                        console.log('[PWA] ServiceWorker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('[PWA] ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
