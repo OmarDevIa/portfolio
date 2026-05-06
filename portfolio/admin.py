@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.conf import settings
 from django.db.models import Count
@@ -8,6 +9,15 @@ from types import MethodType
 from django.utils import timezone
 
 from .models import ContactMessage, HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
+
+
+class SiteProfileAdminForm(forms.ModelForm):
+    class Meta:
+        model = SiteProfile
+        fields = '__all__'
+        widgets = {
+            'smtp_app_password': forms.PasswordInput(render_value=True),
+        }
 
 
 def admin_dashboard_view(request):
@@ -131,6 +141,7 @@ class ProjectAdmin(admin.ModelAdmin):
 
 @admin.register(SiteProfile)
 class SiteProfileAdmin(admin.ModelAdmin):
+    form = SiteProfileAdminForm
     list_display = ('full_name', 'brand_name', 'email')
 
     fieldsets = (
@@ -167,6 +178,14 @@ class SiteProfileAdmin(admin.ModelAdmin):
         }),
         ('Contacts', {
             'fields': ('email', 'whatsapp_url', 'linkedin_url', 'github_url', 'footer_tagline')
+        }),
+        ('Email & notifications', {
+            'fields': (
+                'contact_recipient_email',
+                'mail_from_email',
+                'smtp_username',
+                'smtp_app_password',
+            )
         }),
         ('SEO & Google', {
             'fields': ('google_analytics_id', 'google_analytics_dashboard_url', 'google_site_verification')
