@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator, MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.utils.deconstruct import deconstructible
 from django_ckeditor_5.fields import CKEditor5Field
@@ -193,6 +194,26 @@ class SiteProfile(models.Model):
     testimonials_section_title = models.CharField(_('titre temoignages'), max_length=160, default='Ce que disent mes clients', blank=True)
     contact_section_subtitle = models.CharField(_('sous-titre contact'), max_length=120, default='Contact', blank=True)
     contact_section_title = models.CharField(_('titre contact'), max_length=160, default='Obtenir un devis gratuit', blank=True)
+    google_analytics_id = models.CharField(
+        _('ID Google Analytics'),
+        max_length=40,
+        blank=True,
+        default='',
+        help_text=_('Exemple : G-XXXXXXXXXX'),
+    )
+    google_analytics_dashboard_url = models.URLField(
+        _('URL tableau de bord Google Analytics'),
+        blank=True,
+        default='',
+        help_text=_('Lien direct vers votre propri\u00e9t\u00e9 Google Analytics.'),
+    )
+    google_site_verification = models.CharField(
+        _('code de v\u00e9rification Google'),
+        max_length=255,
+        blank=True,
+        default='',
+        help_text=_('Code utilis\u00e9 pour la balise meta google-site-verification.'),
+    )
 
     class Meta:
         verbose_name = _('profil du site')
@@ -332,6 +353,29 @@ class Service(models.Model):
 
     def get_detail_points(self):
         return [line.strip() for line in self.detail_points.splitlines() if line.strip()]
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)[:130] or 'service'
+            slug = base_slug
+            index = 2
+            while Service.objects.exclude(pk=self.pk).filter(slug=slug).exists():
+                suffix = f'-{index}'
+                slug = f'{base_slug[:140 - len(suffix)]}{suffix}'
+                index += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def get_video_mime_type(self):
+        if not self.demo_video_file:
+            return ''
+
+        file_name = self.demo_video_file.name.lower()
+        if file_name.endswith('.webm'):
+            return 'video/webm'
+        if file_name.endswith('.ogg'):
+            return 'video/ogg'
+        return 'video/mp4'
 
 
 class Skill(models.Model):

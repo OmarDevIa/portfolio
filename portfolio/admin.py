@@ -11,6 +11,7 @@ from .models import ContactMessage, HeroSlide, KPI, Project, Service, SiteProfil
 
 
 def admin_dashboard_view(request):
+    site_profile = SiteProfile.objects.first()
     today = timezone.now()
     six_months_ago = today - timezone.timedelta(days=180)
 
@@ -55,6 +56,7 @@ def admin_dashboard_view(request):
     context = {
         **admin.site.each_context(request),
         'title': 'Tableau de bord',
+        'admin_base_path': getattr(settings, 'ADMIN_BASE_PATH', '/admin/'),
         'project_count': Project.objects.count(),
         'featured_count': Project.objects.filter(is_featured=True).count(),
         'message_count': ContactMessage.objects.count(),
@@ -68,9 +70,18 @@ def admin_dashboard_view(request):
         'chart_testimonial_totals': [testimonial_lookup.get(key, 0) for key in month_keys],
         'category_chart_labels': [category_labels.get(item['category'], item['category']) for item in project_by_category],
         'category_chart_totals': [item['total'] for item in project_by_category],
-        'google_analytics_dashboard_url': getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', ''),
-        'google_analytics_id': getattr(settings, 'GOOGLE_ANALYTICS_ID', ''),
-        'google_site_verification': getattr(settings, 'GOOGLE_SITE_VERIFICATION', ''),
+        'google_analytics_dashboard_url': (
+            getattr(site_profile, 'google_analytics_dashboard_url', '')
+            or getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', '')
+        ),
+        'google_analytics_id': (
+            getattr(site_profile, 'google_analytics_id', '')
+            or getattr(settings, 'GOOGLE_ANALYTICS_ID', '')
+        ),
+        'google_site_verification': (
+            getattr(site_profile, 'google_site_verification', '')
+            or getattr(settings, 'GOOGLE_SITE_VERIFICATION', '')
+        ),
         'site_url': getattr(settings, 'SITE_URL', ''),
     }
     return TemplateResponse(request, 'admin/dashboard.html', context)
@@ -156,6 +167,9 @@ class SiteProfileAdmin(admin.ModelAdmin):
         }),
         ('Contacts', {
             'fields': ('email', 'whatsapp_url', 'linkedin_url', 'github_url', 'footer_tagline')
+        }),
+        ('SEO & Google', {
+            'fields': ('google_analytics_id', 'google_analytics_dashboard_url', 'google_site_verification')
         }),
     )
 

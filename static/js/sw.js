@@ -3,16 +3,17 @@
  * Cache stratégique pour une expérience offline et chargement rapide
  */
 
-const CACHE_NAME = 'omar-tech-v1';
-const STATIC_CACHE = 'omar-tech-static-v1';
-const DYNAMIC_CACHE = 'omar-tech-dynamic-v1';
+const CACHE_NAME = 'omar-tech-v2';
+const STATIC_CACHE = 'omar-tech-static-v2';
+const DYNAMIC_CACHE = 'omar-tech-dynamic-v2';
 
 // Ressources à mettre en cache immédiatement
 const STATIC_ASSETS = [
   '/',
+  '/offline/',
   '/static/css/style.css',
   '/static/js/script.js',
-  '/static/img/favicon.png',
+  '/static/img/og-cover.png',
   '/static/img/profile.svg',
   '/static/manifest.json',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
@@ -197,8 +198,8 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: '/static/img/favicon.png',
-    badge: '/static/img/favicon.png',
+    icon: '/static/img/og-cover.png',
+    badge: '/static/img/og-cover.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),

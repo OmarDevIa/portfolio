@@ -56,7 +56,7 @@ def _get_hero_slides():
     ]
 
 
-def _build_seo_context(request, project=None, service=None):
+def _build_seo_context(request, project=None, service=None, site_profile=None):
     """
     name : build_seo_context
     description : Construit le contexte SEO pour les pages du site.
@@ -64,15 +64,16 @@ def _build_seo_context(request, project=None, service=None):
     date : 2024-06-01
 
     """
+    site_profile = site_profile or _get_site_profile()
     canonical_url = request.build_absolute_uri()
     seo_context = {
         'canonical_url': canonical_url,
         'og_url': canonical_url,
         'site_url': getattr(settings, 'SITE_URL', '').rstrip('/') or request.build_absolute_uri('/').rstrip('/'),
         'github_profile_url': getattr(settings, 'GITHUB_PROFILE_URL', ''),
-        'google_analytics_id': getattr(settings, 'GOOGLE_ANALYTICS_ID', ''),
-        'google_analytics_dashboard_url': getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', ''),
-        'google_site_verification': getattr(settings, 'GOOGLE_SITE_VERIFICATION', ''),
+        'google_analytics_id': getattr(site_profile, 'google_analytics_id', '') or getattr(settings, 'GOOGLE_ANALYTICS_ID', ''),
+        'google_analytics_dashboard_url': getattr(site_profile, 'google_analytics_dashboard_url', '') or getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', ''),
+        'google_site_verification': getattr(site_profile, 'google_site_verification', '') or getattr(settings, 'GOOGLE_SITE_VERIFICATION', ''),
         # Sentry monitoring context
         'sentry_dsn': getattr(settings, 'SENTRY_DSN', ''),
         'sentry_environment': getattr(settings, 'SENTRY_ENVIRONMENT', 'production'),
@@ -140,7 +141,7 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
         'hero_slides': _get_hero_slides(),
         'cert_total': cert_total,
     }
-    context.update(_build_seo_context(request))
+    context.update(_build_seo_context(request, site_profile=site_profile))
     return context
 
 
@@ -208,7 +209,7 @@ def project_detail(request, slug):
         'form':    ContactForm(),
         'site_profile': _get_site_profile(),
     }
-    context.update(_build_seo_context(request, project=project))
+    context.update(_build_seo_context(request, project=project, site_profile=context['site_profile']))
     return render(request, 'portfolio/project_detail.html', context)
 
 
@@ -225,8 +226,23 @@ def service_detail(request, slug):
         'service': service,
         'site_profile': _get_site_profile(),
     }
-    context.update(_build_seo_context(request, service=service))
+    context.update(_build_seo_context(request, service=service, site_profile=context['site_profile']))
     return render(request, 'portfolio/service_detail.html', context)
+
+
+def offline(request):
+    """
+    name : offline
+    description : Affiche une page simple pour le mode hors ligne.
+    author : Ingenieur Omar Atta
+    date : 2024-06-01
+
+    """
+    context = {
+        'site_profile': _get_site_profile(),
+    }
+    context.update(_build_seo_context(request, site_profile=context['site_profile']))
+    return render(request, 'portfolio/offline.html', context)
 
 
 @require_POST
@@ -277,11 +293,10 @@ def contact(request):
             response_message = 'Message envoyé avec succès !'
         elif not (settings.DEFAULT_FROM_EMAIL and settings.CONTACT_RECIPIENT_EMAIL):
             response_message = 'Message enregistré. Configurez l’email serveur pour recevoir les notifications.'
-        if _wants_json(request):
-            return JsonResponse({'status': 'ok', 'message': response_message})
         if rate_key:
             cache.set(rate_key, submissions + 1, timeout=_CONTACT_RATE_WINDOW)
-        cache.set(rate_key, submissions + 1, timeout=_CONTACT_RATE_WINDOW)
+        if _wants_json(request):
+            return JsonResponse({'status': 'ok', 'message': response_message})
         context = _build_home_context(request)
         context['contact_success_message'] = response_message
         return render(request, 'portfolio/home.html', context)
@@ -319,13 +334,13 @@ def submit_testimonial(request):
     if form.is_valid():
         form.save()
         response_message = 'Merci. Votre avis a bien été reçu et sera publié après validation par l’administrateur.'
+        if rate_key:
+            cache.set(rate_key, submissions + 1, timeout=_TESTIMONIAL_RATE_WINDOW)
         if _wants_json(request):
             return JsonResponse({
                 'status': 'ok',
                 'message': response_message
             })
-        if rate_key:
-            cache.set(rate_key, submissions + 1, timeout=_TESTIMONIAL_RATE_WINDOW)
         context = _build_home_context(request, testimonial_form=TestimonialForm())
         context['testimonial_success_message'] = response_message
         return render(request, 'portfolio/home.html', context)

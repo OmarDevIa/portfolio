@@ -1,6 +1,8 @@
-import os
 import importlib.util
+import os
+import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,22 +12,40 @@ def env_bool(name, default=False):
     return os.getenv(name, str(default)).strip().lower() in {'1', 'true', 'yes', 'on'}
 
 
-def _build_csrf_trusted_origins():
-    origins = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
-    site_url = os.getenv('SITE_URL', '').strip().rstrip('/')
-    if site_url.startswith('https://'):
-        origins.append(site_url)
-    return origins
+def module_is_available(module_name):
+    return importlib.util.find_spec(module_name) is not None
+
+
+def split_env_list(name, default=''):
+    return [item.strip() for item in os.getenv(name, default).split(',') if item.strip()]
+
+
+def build_csrf_trusted_origins():
+    origins = split_env_list('CSRF_TRUSTED_ORIGINS')
+    if SITE_URL.startswith('https://'):
+        origins.append(SITE_URL)
+    return list(dict.fromkeys(origins))
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+RUNNING_TESTS = 'test' in sys.argv
 
-SECRET_KEY = os.getenv('SECRET_KEY', '')
+DEBUG = env_bool('DEBUG', True)
+SECRET_KEY = os.getenv('SECRET_KEY', '').strip()
 if not SECRET_KEY or 'insecure' in SECRET_KEY:
-    if not env_bool('DEBUG', True):
+    if not DEBUG:
         raise RuntimeError('SECRET_KEY must be set to a secure value in production. Set it in your .env file.')
     SECRET_KEY = SECRET_KEY or 'django-insecure-dev-only-change-me'
-DEBUG = env_bool('DEBUG', True)
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',') if host.strip()]
+
+ALLOWED_HOSTS = split_env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
+SITE_URL = os.getenv('SITE_URL', 'https://omar-tech.com').strip().rstrip('/')
+ADMIN_URL = os.getenv('ADMIN_URL', 'amarou-wankoye1897/').strip().lstrip('/')
+ADMIN_BASE_PATH = f'/{ADMIN_URL.rstrip("/")}/'
+ADMIN_DASHBOARD_PATH = f'{ADMIN_BASE_PATH}tableau-de-bord/'
+
+HAS_CSP = module_is_available('csp')
+HAS_JAZZMIN = module_is_available('jazzmin')
+HAS_HONEYGUARD = module_is_available('django_honeyguard')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,12 +59,14 @@ INSTALLED_APPS = [
     'portfolio',
 ]
 
-# Content Security Policy
-if not DEBUG:
+if HAS_CSP and not DEBUG:
     INSTALLED_APPS.append('csp')
 
-if importlib.util.find_spec('jazzmin') is not None:
+if HAS_JAZZMIN:
     INSTALLED_APPS.insert(0, 'jazzmin')
+
+if HAS_HONEYGUARD:
+    INSTALLED_APPS.append('django_honeyguard')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +78,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if HAS_CSP and not DEBUG:
+    MIDDLEWARE.append('csp.middleware.CSPMiddleware')
 
 ROOT_URLCONF = 'portfolio_site.urls'
 
@@ -108,7 +133,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = os.getenv(
     'EMAIL_BACKEND',
-    'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'
+    'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend',
 )
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
@@ -120,19 +145,19 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'portfolio@localhost')
 SERVER_EMAIL = os.getenv('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
 CONTACT_RECIPIENT_EMAIL = os.getenv('CONTACT_RECIPIENT_EMAIL', EMAIL_HOST_USER or DEFAULT_FROM_EMAIL)
-SITE_URL = os.getenv('SITE_URL', 'https://omar-tech.com').rstrip('/')
+
 GITHUB_PROFILE_URL = os.getenv('GITHUB_PROFILE_URL', '').strip()
 GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '').strip()
 GOOGLE_ANALYTICS_DASHBOARD_URL = os.getenv('GOOGLE_ANALYTICS_DASHBOARD_URL', '').strip()
 GOOGLE_SITE_VERIFICATION = os.getenv('GOOGLE_SITE_VERIFICATION', '').strip()
 
-# Sentry - Error tracking and monitoring
 SENTRY_DSN = os.getenv('SENTRY_DSN', '').strip()
 SENTRY_ENVIRONMENT = os.getenv('SENTRY_ENVIRONMENT', 'production' if not DEBUG else 'development').strip()
 SENTRY_TRACES_SAMPLE_RATE = float(os.getenv('SENTRY_TRACES_SAMPLE_RATE', '0.1'))
 
 if SENTRY_DSN and not DEBUG:
     import sentry_sdk
+
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         environment=SENTRY_ENVIRONMENT,
@@ -140,7 +165,7 @@ if SENTRY_DSN and not DEBUG:
         profiles_sample_rate=0.1,
         send_default_pii=False,
         integrations=[
-            # Django integration is auto-detected
+            # Django integration is auto-detected.
         ],
     )
 
@@ -169,7 +194,7 @@ JAZZMIN_SETTINGS = {
     'topmenu_links': [],
     'usermenu_links': [
         {'name': 'Site public', 'url': 'home', 'new_window': True},
-        {'name': 'Tableau de bord', 'url': '/admin/tableau-de-bord/'},
+        {'name': 'Tableau de bord', 'url': ADMIN_DASHBOARD_PATH},
     ],
     'show_sidebar': True,
     'navigation_expanded': True,
@@ -179,7 +204,7 @@ JAZZMIN_SETTINGS = {
         'portfolio': [
             {
                 'name': 'Dashboard admin',
-                'url': '/admin/tableau-de-bord/',
+                'url': ADMIN_DASHBOARD_PATH,
                 'icon': 'fas fa-gauge-high',
                 'new_window': False,
             },
@@ -200,6 +225,7 @@ JAZZMIN_SETTINGS = {
         'portfolio.Testimonial': 'fas fa-comment-dots',
         'portfolio.KPI': 'fas fa-chart-simple',
         'portfolio.ContactMessage': 'fas fa-envelope-open-text',
+        'django_honeyguard.HoneyGuardLog': 'fas fa-shield-halved',
         'auth.user': 'fas fa-user-shield',
         'auth.Group': 'fas fa-users-gear',
     },
@@ -236,6 +262,11 @@ JAZZMIN_UI_TWEAKS = {
     },
 }
 
+HONEYGUARD_NOTIFY_ADMINS = True
+HONEYGUARD_LOG_TO_DB = True
+HONEYGUARD_BLOCK_THRESHOLD = 3
+HONEYGUARD_BLOCK_DURATION = 86400
+
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -243,7 +274,7 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = not RUNNING_TESTS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -251,55 +282,57 @@ if not DEBUG:
     CSRF_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SAMESITE = 'Lax'
-    CSRF_TRUSTED_ORIGINS = _build_csrf_trusted_origins()
+    CSRF_TRUSTED_ORIGINS = build_csrf_trusted_origins()
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-    # Content Security Policy
-    CSP_DEFAULT_SRC = ("'self'",)
-    CSP_SCRIPT_SRC = (
-        "'self'",
-        "'unsafe-inline'",  # Required for some Django features
-        "'unsafe-eval'",    # Required for some third-party scripts
-        'https://cdn.jsdelivr.net',
-        'https://cdnjs.cloudflare.com',
-        'https://www.googletagmanager.com',
-        'https://www.google.com',
-        'https://www.gstatic.com',
-    )
-    CSP_STYLE_SRC = (
-        "'self'",
-        "'unsafe-inline'",  # Required for Bootstrap and custom styles
-        'https://cdn.jsdelivr.net',
-        'https://cdnjs.cloudflare.com',
-        'https://fonts.googleapis.com',
-    )
-    CSP_FONT_SRC = (
-        "'self'",
-        'https://cdn.jsdelivr.net',
-        'https://cdnjs.cloudflare.com',
-        'https://fonts.gstatic.com',
-    )
-    CSP_IMG_SRC = (
-        "'self'",
-        'data:',
-        'blob:',
-        'https:',
-    )
-    CSP_CONNECT_SRC = (
-        "'self'",
-        'https://www.google-analytics.com',
-        'https://stats.g.doubleclick.net',
-        'https://translate.google.com',
-    )
-    CSP_FRAME_SRC = (
-        "'self'",
-        'https://www.google.com',
-        'https://translate.google.com',
-    )
-    CSP_OBJECT_SRC = ("'none'",)
-    CSP_MEDIA_SRC = ("'self'", 'blob:')
-    CSP_FRAME_ANCESTORS = ("'none'",)
-    CSP_BASE_URI = ("'self'",)
-    CSP_FORM_ACTION = ("'self'",)
-    CSP_REPORT_URI = ('/csp-report/',)
-    CSP_REPORT_ONLY = False  # Set to True initially to test without blocking
+    CONTENT_SECURITY_POLICY = {
+        'DIRECTIVES': {
+            'default-src': ("'self'",),
+            'script-src': (
+                "'self'",
+                "'unsafe-inline'",
+                "'unsafe-eval'",
+                'https://cdn.jsdelivr.net',
+                'https://cdnjs.cloudflare.com',
+                'https://www.googletagmanager.com',
+                'https://www.google.com',
+                'https://www.gstatic.com',
+            ),
+            'style-src': (
+                "'self'",
+                "'unsafe-inline'",
+                'https://cdn.jsdelivr.net',
+                'https://cdnjs.cloudflare.com',
+                'https://fonts.googleapis.com',
+            ),
+            'font-src': (
+                "'self'",
+                'https://cdn.jsdelivr.net',
+                'https://cdnjs.cloudflare.com',
+                'https://fonts.gstatic.com',
+            ),
+            'img-src': (
+                "'self'",
+                'data:',
+                'blob:',
+                'https:',
+            ),
+            'connect-src': (
+                "'self'",
+                'https://www.google-analytics.com',
+                'https://stats.g.doubleclick.net',
+                'https://translate.google.com',
+            ),
+            'frame-src': (
+                "'self'",
+                'https://www.google.com',
+                'https://translate.google.com',
+            ),
+            'object-src': ("'none'",),
+            'media-src': ("'self'", 'blob:'),
+            'frame-ancestors': ("'none'",),
+            'base-uri': ("'self'",),
+            'form-action': ("'self'",),
+            'report-uri': ('/csp-report/',),
+        },
+    }

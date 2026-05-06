@@ -1,0 +1,19 @@
+{% extends 'portfolio/base.html' %}
+
+{% block title %}Mode hors ligne | {{ site_profile.full_name|default:'Omar Atta' }}{% endblock %}
+{% block meta_description %}Vous etes actuellement hors ligne. Revenez des que la connexion est retablie.{% endblock %}
+
+{% block content %}
+<section class="section-area" style="padding-top: 140px; min-height: 70vh;">
+    <div class="container">
+        <div class="container-inner text-center reveal">
+            <p class="section-sub">Connexion indisponible</p>
+            <h1 class="section-title">Mode hors ligne</h1>
+            <p class="section-desc">Cette page a ete mise en cache. Reessayez quand votre connexion sera revenue.</p>
+            <div class="about-btns justify-content-center">
+                <a href="{% url 'home' %}" class="btn-main">Retour a l'accueil</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

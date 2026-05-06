@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: omar-tech-portfolio
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "gunicorn portfolio_site.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: SITE_URL
+        sync: false
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.console.EmailBackend
+      - key: DEFAULT_FROM_EMAIL
+        value: portfolio@omar-tech.com
+      - key: CONTACT_RECIPIENT_EMAIL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: GOOGLE_ANALYTICS_ID
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+    disk:
+      name: media-data
+      mountPath: /opt/render/project/src/media
+      sizeGB: 1

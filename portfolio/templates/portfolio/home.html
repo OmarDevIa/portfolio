@@ -196,8 +196,8 @@
 
 <div class="tech-marquee-wrap reveal">
     <div class="tech-marquee-inner">
-        {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
-        {% for tech in site_profile.get_tech_stack_items %}<span>{{ tech }}</span>{% endfor %}
+        {% for tech in site_profile.get_tech_stack_items %}<span class="tech-marquee-item">{{ tech }}</span>{% endfor %}
+        {% for tech in site_profile.get_tech_stack_items %}<span class="tech-marquee-item tech-marquee-copy" aria-hidden="true">{{ tech }}</span>{% endfor %}
     </div>
 </div>
 

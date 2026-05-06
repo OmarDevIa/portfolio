@@ -325,10 +325,13 @@ ul, li { list-style: none; }
     box-shadow: var(--shadow);
     position: sticky;
     top: 90px;
+    overflow: hidden;
 }
 
 .profile-photo {
-    width: 160px; height: 160px;
+    width: min(160px, 42vw);
+    height: min(160px, 42vw);
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     object-fit: cover;
     object-position: center 20%;
@@ -337,7 +340,7 @@ ul, li { list-style: none; }
     background: #1b150b;
     box-shadow: 0 16px 38px rgba(0,0,0,0.45), 0 0 0 6px rgba(63,160,122,0.14);
     margin: 0 auto 1.2rem;
-    animation: floatY 6s var(--ease-soft) infinite;
+    animation: floatY 6s var(--ease-soft) infinite, profileGlow 6s ease-in-out infinite;
 }
 
 .profile-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
@@ -433,11 +436,16 @@ ul, li { list-style: none; }
     gap: 2rem;
     min-width: max-content;
     animation: marquee 30s linear infinite;
+    will-change: transform;
     font-size: 0.82rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted);
+}
+.tech-marquee-inner span {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 .tech-marquee-inner span::before { content: '· '; color: var(--accent); }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -1872,6 +1880,26 @@ ul, li { list-style: none; }
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-6px); }
 }
+@keyframes profileGlow {
+    0%, 100% {
+        box-shadow: 0 16px 38px rgba(0,0,0,0.45), 0 0 0 6px rgba(63,160,122,0.14);
+    }
+    50% {
+        box-shadow: 0 20px 42px rgba(0,0,0,0.5), 0 0 0 8px rgba(63,160,122,0.18);
+    }
+}
+@keyframes profileGlowMobile {
+    0%, 100% {
+        box-shadow: 0 12px 28px rgba(0,0,0,0.32), 0 0 0 4px rgba(63,160,122,0.12);
+    }
+    50% {
+        box-shadow: 0 15px 32px rgba(0,0,0,0.36), 0 0 0 6px rgba(63,160,122,0.16);
+    }
+}
+@keyframes floatYMobile {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
 
 .reveal {
     opacity: 0;
@@ -1937,11 +1965,110 @@ img[loading="lazy"].loaded {
 
 /* ── RESPONSIVE AJUSTEMENTS ── */
 @media (max-width: 991px) {
-    .profile-card { position: static; }
+    .profile-card {
+        position: static;
+        padding: 28px 20px;
+    }
+    .profile-photo {
+        width: min(148px, 38vw);
+        height: min(148px, 38vw);
+        animation: profileGlowMobile 8.5s ease-in-out infinite;
+        transform: none;
+    }
     .profile-kpis { flex-direction: row; flex-wrap: wrap; }
     .profile-kpi-item { flex: 1; min-width: 120px; }
+
+    .tech-marquee-wrap {
+        padding: 0.7rem 0;
+    }
+
+    .tech-marquee-inner {
+        gap: 1.35rem;
+        animation-duration: 42s;
+        font-size: 0.76rem;
+    }
 }
 @media (max-width: 767px) {
+    .profile-card {
+        padding: 24px 18px;
+        border-radius: 18px;
+    }
+    .profile-photo {
+        width: min(132px, 36vw);
+        height: min(132px, 36vw);
+        padding: 5px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.32), 0 0 0 4px rgba(63,160,122,0.12);
+        animation: profileGlowMobile 9s ease-in-out infinite;
+        transform: none;
+    }
     .cert-proof-row { flex-direction: column; align-items: flex-start; }
     .profile-kpis { flex-direction: column; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .profile-photo {
+        animation: profileGlowMobile 9s ease-in-out infinite;
+        transform: none;
+    }
+}
+
+@media (max-width: 575px) {
+    .tech-marquee-inner {
+        gap: 1.1rem;
+        animation-duration: 54s;
+        font-size: 0.72rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tech-marquee-inner {
+        animation: none;
+        transform: none;
+    }
+}
+
+.tech-marquee-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.tech-marquee-item::before {
+    content: '· ';
+    color: var(--accent);
+}
+
+@media (max-width: 767px) {
+    .tech-marquee-wrap {
+        padding: 0.9rem;
+    }
+
+    .tech-marquee-inner {
+        min-width: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.65rem;
+        animation: none;
+    }
+
+    .tech-marquee-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.45rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface-chip);
+        white-space: normal;
+        text-align: center;
+        line-height: 1.25;
+        letter-spacing: 0.04em;
+    }
+
+    .tech-marquee-item::before {
+        content: none;
+    }
+
+    .tech-marquee-copy {
+        display: none;
+    }
 }

@@ -139,6 +139,16 @@ class PortfolioFlowTests(TestCase):
 		self.assertContains(response, 'application/ld+json', html=False)
 		self.assertContains(response, 'rel="canonical"', html=False)
 
+	def test_home_uses_google_settings_from_site_profile(self):
+		self.site_profile.google_analytics_id = 'G-TEST123456'
+		self.site_profile.google_site_verification = 'google-site-code'
+		self.site_profile.save()
+
+		response = self.client.get(reverse('home'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'G-TEST123456')
+		self.assertContains(response, 'google-site-code')
+
 	def test_project_detail_seo_uses_project_data(self):
 		response = self.client.get(reverse('project_detail', args=[self.project.slug]))
 		self.assertContains(response, 'Assistant virtuel bancaire')
@@ -199,6 +209,72 @@ class PortfolioFlowTests(TestCase):
 		self.site_profile.save()
 		response = self.client.get(reverse('home'))
 		self.assertContains(response, 'Omar Atta Updated')
+
+
+class PortfolioRegressionTests(TestCase):
+	def setUp(self):
+		self.site_profile = SiteProfile.objects.create(
+			full_name='Omar Atta Dynamic',
+			brand_name='Omar.studio',
+			hero_role='Architecte produit',
+			hero_highlight='IA, Apps & Cloud',
+			hero_description='Un profil pilote depuis l admin.',
+			email='dynamic@example.com',
+		)
+
+	def test_offline_page_loads(self):
+		response = self.client.get(reverse('offline'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Mode hors ligne')
+
+	def test_contact_form_increments_rate_limit_for_ajax(self):
+		response = self.client.post(
+			reverse('contact'),
+			{
+				'name': 'Client Afrique',
+				'email': 'client@example.com',
+				'subject': 'Mission IA',
+				'budget': '',
+				'message': 'Nous voulons un assistant virtuel.'
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json'
+		)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(cache.get('contact_rate_127.0.0.1'), 1)
+
+	def test_testimonial_form_increments_rate_limit_for_ajax(self):
+		response = self.client.post(
+			reverse('submit_testimonial'),
+			{
+				'author_name': 'Client Test',
+				'author_email': 'client@example.com',
+				'author_role': 'CEO',
+				'rating': 5,
+				'content': 'Super mission.',
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json',
+		)
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(cache.get('testimonial_rate_127.0.0.1'), 1)
+
+	def test_service_slug_is_generated_when_missing(self):
+		service = Service.objects.create(
+			title='Conseil IA Sur Mesure',
+			description='Une offre de conseil claire.',
+		)
+		self.assertEqual(service.slug, 'conseil-ia-sur-mesure')
+
+	def test_service_detail_uses_uploaded_video_mime_type(self):
+		service = Service.objects.create(
+			title='Audit Cloud',
+			description='Optimisation et migration cloud.',
+			demo_video_file=SimpleUploadedFile('demo.webm', VIDEO_BYTES, content_type='video/webm'),
+		)
+		response = self.client.get(reverse('service_detail', args=[service.slug]))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'video/webm')
 
 
 class SeedPortfolioCommandTests(TestCase):

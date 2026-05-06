@@ -31,11 +31,12 @@
     {% endif %}
 
     <!-- Favicon -->
-    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png">
-    <link rel="apple-touch-icon" href="{% static 'img/favicon.png' %}">
+    <link rel="icon" href="{% static 'img/og-cover.png' %}" type="image/png">
+    <link rel="apple-touch-icon" href="{% static 'img/og-cover.png' %}">
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Omar.tech">
@@ -80,7 +81,7 @@
         "@type": "Organization",
         "name": "{{ site_profile.brand_name|default:'Omar.tech' }}",
         "url": "{{ canonical_url|default:site_url }}",
-        "logo": "{{ site_url }}/static/img/favicon.png",
+        "logo": "{{ site_url }}/static/img/og-cover.png",
         "sameAs": [
             "{{ site_profile.linkedin_url|default:'' }}"{% if site_profile.github_url %},"{{ site_profile.github_url }}"{% endif %}
         ]

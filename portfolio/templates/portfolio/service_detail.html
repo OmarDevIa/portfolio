@@ -47,7 +47,7 @@
                 {% if service.has_video %}
                 <div class="service-video-block">
                     <video controls playsinline preload="metadata" class="service-video-player">
-                        <source src="{{ service.demo_video_file.url }}" type="video/mp4">
+                        <source src="{{ service.demo_video_file.url }}" type="{{ service.get_video_mime_type }}">
                         Votre navigateur ne supporte pas la lecture vidéo.
                     </video>
                 </div>
