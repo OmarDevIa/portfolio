@@ -8,7 +8,7 @@ from django.urls import path
 from types import MethodType
 from django.utils import timezone
 
-from .models import ContactMessage, HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
+from .models import ContactMessage, HeroSlide, KPI, Project, ProjectCategory, Service, SiteProfile, Skill, Testimonial, Tool
 
 
 class SiteProfileAdminForm(forms.ModelForm):
@@ -43,7 +43,8 @@ def admin_dashboard_view(request):
         Project.objects.values('category').annotate(total=Count('id')).order_by('category')
     )
 
-    category_labels = dict(Project.CATEGORY_CHOICES)
+    categories = list(ProjectCategory.objects.order_by('order', 'name'))
+    category_totals_map = {item['category']: item['total'] for item in project_by_category}
     message_lookup = {
         item['month'].strftime('%Y-%m'): item['total']
         for item in monthly_messages
@@ -71,15 +72,13 @@ def admin_dashboard_view(request):
         'featured_count': Project.objects.filter(is_featured=True).count(),
         'message_count': ContactMessage.objects.count(),
         'unread_message_count': ContactMessage.objects.filter(is_read=False).count(),
-        'testimonial_count': Testimonial.objects.count(),
-        'pending_testimonial_count': Testimonial.objects.filter(is_visible=False).count(),
+        'category_chart_labels': [category.name for category in categories],
+        'category_chart_totals': [category_totals_map.get(category.id, 0) for category in categories],
         'recent_messages': ContactMessage.objects.order_by('-received_at')[:5],
         'recent_testimonials': Testimonial.objects.order_by('-submitted_at')[:5],
         'chart_month_labels': chart_month_labels,
         'chart_message_totals': [message_lookup.get(key, 0) for key in month_keys],
         'chart_testimonial_totals': [testimonial_lookup.get(key, 0) for key in month_keys],
-        'category_chart_labels': [category_labels.get(item['category'], item['category']) for item in project_by_category],
-        'category_chart_totals': [item['total'] for item in project_by_category],
         'google_analytics_dashboard_url': (
             getattr(site_profile, 'google_analytics_dashboard_url', '')
             or getattr(settings, 'GOOGLE_ANALYTICS_DASHBOARD_URL', '')
@@ -132,6 +131,11 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('live_url', 'github_url', 'tags')
         }),
     )
+@admin.register(ProjectCategory)
+class ProjectCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'order')
+    list_editable = ('order',)
+    prepopulated_fields = {'slug': ('name',)}
 
     def has_video(self, obj):
         return obj.has_video

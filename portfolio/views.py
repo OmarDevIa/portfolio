@@ -6,6 +6,7 @@ import logging
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.core.cache import cache
+from django.core.mail import get_connection
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.http import require_POST
@@ -14,7 +15,7 @@ from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
-from .models import HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
+from .models import HeroSlide, KPI, Project, ProjectCategory, Service, SiteProfile, Skill, Testimonial, Tool
 from .forms import ContactForm, TestimonialForm
 
 _CONTACT_RATE_LIMIT = 3  # max submissions per window
@@ -85,6 +86,34 @@ def _build_seo_context(request, project=None, service=None, site_profile=None):
     return seo_context
 
 
+def _get_dynamic_mail_settings(site_profile=None):
+    site_profile = site_profile or _get_site_profile()
+    return {
+        'from_email': getattr(site_profile, 'mail_from_email', '').strip() or getattr(settings, 'DEFAULT_FROM_EMAIL', ''),
+        'recipient_email': getattr(site_profile, 'contact_recipient_email', '').strip() or getattr(settings, 'CONTACT_RECIPIENT_EMAIL', ''),
+        'smtp_username': getattr(site_profile, 'smtp_username', '').strip() or getattr(settings, 'EMAIL_HOST_USER', ''),
+        'smtp_app_password': getattr(site_profile, 'smtp_app_password', '').strip() or getattr(settings, 'EMAIL_HOST_PASSWORD', ''),
+    }
+
+
+def _build_mail_connection(mail_settings):
+    backend = getattr(settings, 'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+    if backend != 'django.core.mail.backends.smtp.EmailBackend':
+        return get_connection(backend=backend, fail_silently=False)
+
+    return get_connection(
+        backend=backend,
+        fail_silently=False,
+        host=getattr(settings, 'EMAIL_HOST', ''),
+        port=getattr(settings, 'EMAIL_PORT', 25),
+        username=mail_settings['smtp_username'] or None,
+        password=mail_settings['smtp_app_password'] or None,
+        use_tls=getattr(settings, 'EMAIL_USE_TLS', False),
+        use_ssl=getattr(settings, 'EMAIL_USE_SSL', False),
+        timeout=getattr(settings, 'EMAIL_TIMEOUT', None),
+    )
+
+
 def _wants_json(request):
     """
     name : wants_json
@@ -108,13 +137,14 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
     """
     site_profile = _get_site_profile()
     projects = Project.objects.all()
+    categories = list(ProjectCategory.objects.order_by('order', 'name'))
     category_groups = []
-    for value, label in Project.CATEGORY_CHOICES:
-        grouped_projects = projects.filter(category=value)
+    for category in categories:
+        grouped_projects = projects.filter(category=category)
         if grouped_projects.exists():
             category_groups.append({
-                'value': value,
-                'label': label,
+                'value': category.slug,
+                'label': category.name,
                 'projects': grouped_projects,
                 'count': grouped_projects.count(),
             })
@@ -135,7 +165,7 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
         'kpis': KPI.objects.all(),
         'form': contact_form or ContactForm(),
         'testimonial_form': testimonial_form or TestimonialForm(),
-        'categories': Project.CATEGORY_CHOICES,
+        'categories': categories,
         'category_groups': category_groups,
         'site_profile': site_profile,
         'hero_slides': _get_hero_slides(),
@@ -272,9 +302,11 @@ def contact(request):
     form = ContactForm(request.POST)
     if form.is_valid():
         msg = form.save()
-        email_sent = bool(settings.DEFAULT_FROM_EMAIL and settings.CONTACT_RECIPIENT_EMAIL)
+        mail_settings = _get_dynamic_mail_settings()
+        email_sent = bool(mail_settings['from_email'] and mail_settings['recipient_email'])
         try:
             if email_sent:
+                connection = _build_mail_connection(mail_settings)
                 send_mail(
                     subject=f"[Portfolio] {msg.subject}",
                     message=(
@@ -282,16 +314,17 @@ def contact(request):
                         f"Budget : {msg.budget or 'Non précisé'}\n\n"
                         f"{msg.message}"
                     ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[settings.CONTACT_RECIPIENT_EMAIL],
+                    from_email=mail_settings['from_email'],
+                    recipient_list=[mail_settings['recipient_email']],
                     fail_silently=False,
+                    connection=connection,
                 )
         except Exception:
             email_sent = False
         response_message = 'Message enregistré avec succès !'
         if email_sent:
             response_message = 'Message envoyé avec succès !'
-        elif not (settings.DEFAULT_FROM_EMAIL and settings.CONTACT_RECIPIENT_EMAIL):
+        elif not (mail_settings['from_email'] and mail_settings['recipient_email']):
             response_message = 'Message enregistré. Configurez l’email serveur pour recevoir les notifications.'
         if rate_key:
             cache.set(rate_key, submissions + 1, timeout=_CONTACT_RATE_WINDOW)

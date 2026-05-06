@@ -211,13 +211,13 @@
             </div>
             <ul class="project-filter">
                 <li data-filter="all" class="active">Tous</li>
-                {% for value, label in categories %}
-                <li data-filter="{{ value }}">{{ label }}</li>
+                {% for category in categories %}
+                <li data-filter="{{ category.slug }}">{{ category.name }}</li>
                 {% endfor %}
             </ul>
             <div class="row g-4 project-grid">
                 {% for project in projects|slice:":6" %}
-                <div class="col-lg-4 col-md-6 project-item animate-up" data-category="{{ project.category }}" style="animation-delay:{{ forloop.counter0 }}00ms">
+                <div class="col-lg-4 col-md-6 project-item animate-up" data-category="{{ project.category.slug }}" style="animation-delay:{{ forloop.counter0 }}00ms">
                     <div class="project-item-card reveal">
                         <div class="project-img-wrap">
                                <img src="{{ project.thumbnail.url }}"
@@ -229,7 +229,7 @@
                             </a>
                         </div>
                         <div class="project-info">
-                            <span class="project-cat">{{ project.get_category_display }}</span>
+                            <span class="project-cat">{{ project.category.name }}</span>
                             <h3><a href="{% url 'project_detail' project.slug %}">{{ project.title }}</a></h3>
                             <p class="project-short-desc">{{ project.short_description }}</p>
                             {% if project.result %}

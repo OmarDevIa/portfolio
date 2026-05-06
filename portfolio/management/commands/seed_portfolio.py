@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from PIL import Image
 
-from portfolio.models import KPI, Project, Service, Skill, Testimonial, Tool
+from portfolio.models import KPI, Project, ProjectCategory, Service, Skill, Testimonial, Tool
 
 
 SHOWCASE_PROJECTS = [
@@ -91,6 +91,14 @@ SHOWCASE_PROJECTS = [
     },
 ]
 
+PROJECT_CATEGORIES = [
+    ('ia', 'IA & chatbot', 1),
+    ('web', 'Web & e-commerce', 2),
+    ('mobile', 'Application Mobile', 3),
+    ('automation', 'Automatisation', 4),
+    ('erp', 'ERP / CRM', 5),
+]
+
 
 SERVICES = [
     ('fas fa-brain', 'Solutions IA & assistants virtuels', 'Conception de copilotes, chatbots, RAG, automatisation documentaire et agents métier.', 1),
@@ -143,10 +151,24 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        category_map = {}
+        for code, name, order in PROJECT_CATEGORIES:
+            category, _created = ProjectCategory.objects.update_or_create(
+                slug=code,
+                defaults={'name': name, 'order': order},
+            )
+            category_map[code] = category
+
         projects = []
         for item in SHOWCASE_PROJECTS:
             data = item.copy()
             color = data.pop('color')
+            category_code = data.pop('category')
+            category = category_map.get(category_code)
+            if category is None:
+                category = ProjectCategory.objects.create(name=category_code, slug=category_code)
+                category_map[category_code] = category
+            data['category'] = category
             project, created = Project.objects.update_or_create(
                 slug=data['slug'],
                 defaults=data,

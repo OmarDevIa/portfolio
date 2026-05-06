@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -131,6 +131,31 @@ class SiteProfile(models.Model):
     footer_tagline = models.CharField(_('sous-titre footer'), max_length=160, default='Ingénieur Freelance IA & Logiciel')
     availability_text = models.CharField(_('texte de disponibilité'), max_length=180, default='Disponible pour nouvelles missions — Afrique & Remote')
     email = models.EmailField(_('email'), default='')
+    contact_recipient_email = models.EmailField(
+        _('email de réception contact'),
+        blank=True,
+        default='',
+        help_text=_("Adresse qui reçoit les messages du formulaire de contact."),
+    )
+    mail_from_email = models.EmailField(
+        _('email expéditeur'),
+        blank=True,
+        default='',
+        help_text=_("Adresse affichée comme expéditeur des emails envoyés par le site."),
+    )
+    smtp_username = models.EmailField(
+        _('email SMTP / Google'),
+        blank=True,
+        default='',
+        help_text=_("Compte Gmail ou SMTP utilisé pour l'envoi des emails."),
+    )
+    smtp_app_password = models.CharField(
+        _('clé application Google'),
+        max_length=255,
+        blank=True,
+        default='',
+        help_text=_("Mot de passe d'application Google ou secret SMTP utilisé pour l'envoi."),
+    )
     whatsapp_url = models.URLField(_('URL WhatsApp'), blank=True, default='')
     linkedin_url = models.URLField(_('URL LinkedIn'), blank=True, default='')
     github_url = models.URLField(_('URL GitHub'), blank=True)
@@ -417,18 +442,41 @@ class Tool(models.Model):
         return self.title
 
 
-class Project(models.Model):
-    CATEGORY_CHOICES = [
-        ('ia', 'IA & chatbot'),
-        ('web', 'Web & e-commerce'),
-        ('mobile', 'Application Mobile'),
-        ('automation', 'Automatisation'),
-        ('erp', 'ERP / CRM'),
-    ]
+class ProjectCategory(models.Model):
+    name = models.CharField(_('nom'), max_length=120, unique=True)
+    slug = models.SlugField(_('slug'), max_length=140, unique=True)
+    order = models.PositiveSmallIntegerField(_('ordre'), default=0)
 
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = _('categorie de projet')
+        verbose_name_plural = _('categories de projet')
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.name)[:130] or 'categorie'
+            slug = base_slug
+            index = 2
+            while ProjectCategory.objects.exclude(pk=self.pk).filter(slug=slug).exists():
+                suffix = f'-{index}'
+                slug = f'{base_slug[:140 - len(suffix)]}{suffix}'
+                index += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+
+class Project(models.Model):
     title = models.CharField(_('titre'), max_length=150)
     slug = models.SlugField(_('slug'), unique=True)
-    category = models.CharField(_('catégorie'), max_length=20, choices=CATEGORY_CHOICES, default='web')
+    category = models.ForeignKey(
+        ProjectCategory,
+        verbose_name=_('categorie'),
+        on_delete=models.PROTECT,
+        related_name='projects',
+    )
     short_description = models.CharField(_('description courte'), max_length=200)
     full_description = CKEditor5Field(_('description complète'))
     challenge = CKEditor5Field(_('problème'), blank=True, help_text=_("Problème client résolu"))
@@ -506,6 +554,24 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        if self.thumbnail and hasattr(self.thumbnail, 'path'):
+            target_size = (1600, 1000)
+            resample = getattr(Image, 'Resampling', Image).LANCZOS
+            try:
+                with Image.open(self.thumbnail.path) as image:
+                    if image.size != target_size:
+                        resized = ImageOps.fit(image, target_size, method=resample)
+                        format_name = (image.format or 'JPEG').upper()
+                        save_kwargs = {}
+                        if format_name in ('JPEG', 'JPG'):
+                            if resized.mode in ('RGBA', 'P'):
+                                resized = resized.convert('RGB')
+                            save_kwargs = {'quality': 90, 'optimize': True}
+                        elif format_name == 'WEBP':
+                            save_kwargs = {'quality': 90}
+                        resized.save(self.thumbnail.path, format=format_name, **save_kwargs)
+            except (OSError, ValueError):
+                pass
         cache.delete('site_profile')
 
     def delete(self, *args, **kwargs):

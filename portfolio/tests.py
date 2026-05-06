@@ -2,12 +2,14 @@ import json
 import tempfile
 
 from django.core.cache import cache
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
+from .forms import ContactForm
 from .models import ContactMessage, HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
 
 
@@ -114,6 +116,36 @@ class PortfolioFlowTests(TestCase):
 		)
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(ContactMessage.objects.count(), 1)
+
+	@override_settings(
+		EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+		DEFAULT_FROM_EMAIL='fallback@example.com',
+		CONTACT_RECIPIENT_EMAIL='fallback-recipient@example.com',
+	)
+	def test_contact_form_uses_dynamic_admin_email_settings(self):
+		self.site_profile.mail_from_email = 'admin-sender@example.com'
+		self.site_profile.contact_recipient_email = 'admin-recipient@example.com'
+		self.site_profile.smtp_username = 'admin-sender@example.com'
+		self.site_profile.smtp_app_password = 'demo-app-password'
+		self.site_profile.save()
+
+		response = self.client.post(
+			reverse('contact'),
+			{
+				'name': 'Client Afrique',
+				'email': 'client@example.com',
+				'subject': 'Mission IA',
+				'budget': ContactForm.BUDGET_CHOICES[3][0],
+				'message': 'Nous voulons un assistant virtuel.'
+			},
+			HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+			HTTP_ACCEPT='application/json'
+		)
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(len(mail.outbox), 1)
+		self.assertEqual(mail.outbox[0].from_email, 'admin-sender@example.com')
+		self.assertEqual(mail.outbox[0].to, ['admin-recipient@example.com'])
 
 	def test_sitemap_lists_projects(self):
 		response = self.client.get(reverse('sitemap'))
