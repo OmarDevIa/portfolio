@@ -30,14 +30,14 @@ def build_csrf_trusted_origins():
 BASE_DIR = Path(__file__).resolve().parent.parent
 RUNNING_TESTS = 'test' in sys.argv
 
-DEBUG = env_bool('DEBUG', True)
+DEBUG = env_bool('DEBUG', False)
 SECRET_KEY = os.getenv('SECRET_KEY', '').strip()
 if not SECRET_KEY or 'insecure' in SECRET_KEY:
     if not DEBUG:
         raise RuntimeError('SECRET_KEY must be set to a secure value in production. Set it in your .env file.')
     SECRET_KEY = SECRET_KEY or 'django-insecure-dev-only-change-me'
 
-ALLOWED_HOSTS = split_env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
+ALLOWED_HOSTS = split_env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,django-porfolio-env.eba-k7qxgmc2.us-west-2.elasticbeanstalk.com')
 SITE_URL = os.getenv('SITE_URL', 'https://omar-tech.com').strip().rstrip('/')
 ADMIN_URL = os.getenv('ADMIN_URL', 'amarou-wankoye1897/').strip().lstrip('/')
 ADMIN_BASE_PATH = f'/{ADMIN_URL.rstrip("/")}/'
@@ -274,7 +274,7 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    SECURE_SSL_REDIRECT = not RUNNING_TESTS
+    SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

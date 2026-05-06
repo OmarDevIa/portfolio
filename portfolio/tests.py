@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from .forms import ContactForm
-from .models import ContactMessage, HeroSlide, KPI, Project, Service, SiteProfile, Skill, Testimonial, Tool
+from .models import ContactMessage, HeroSlide, KPI, Project, ProjectCategory, Service, SiteProfile, Skill, Testimonial, Tool
 
 
 PNG_BYTES = (
@@ -43,10 +43,15 @@ class PortfolioFlowTests(TestCase):
 			theme='teal',
 			order=1,
 		)
+		category = ProjectCategory.objects.create(
+			name='IA & chatbot',
+			slug='ia',
+			order=1,
+		)
 		self.project = Project.objects.create(
 			title='Assistant virtuel bancaire',
 			slug='assistant-virtuel-bancaire',
-			category='ia',
+			category=category,
 			short_description='Assistant IA multicanal pour support client.',
 			full_description='Une plateforme omnicanale pour automatiser le support.',
 			thumbnail=SimpleUploadedFile('thumb.png', PNG_BYTES, content_type='image/png'),
