@@ -1,0 +1,22 @@
+# .ebignore minimal pour Elastic Beanstalk
+# N’ignore rien d’important, tout est inclus sauf les fichiers/dossiers vraiment inutiles pour le déploiement
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+
+# On n’ignore PAS application.py, Procfile, manage.py, requirements.txt, portfolio_site/, portfolio/, static/, media/, etc.
