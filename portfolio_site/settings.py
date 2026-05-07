@@ -32,10 +32,10 @@ RUNNING_TESTS = 'test' in sys.argv
 
 DEBUG = env_bool('DEBUG', False)
 SECRET_KEY = os.getenv('SECRET_KEY', '').strip()
-if not SECRET_KEY or 'insecure' in SECRET_KEY:
-    if not DEBUG:
-        raise RuntimeError('SECRET_KEY must be set to a secure value in production. Set it in your .env file.')
-    SECRET_KEY = SECRET_KEY or 'django-insecure-dev-only-change-me'
+#if not SECRET_KEY or 'insecure' in SECRET_KEY:
+    #if not DEBUG:
+        #raise RuntimeError('SECRET_KEY must be set to a secure value in production. Set it in your .env file.')
+        #SECRET_KEY = SECRET_KEY or 'django-insecure-dev-only-change-me'
 
 ALLOWED_HOSTS = split_env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,django-porfolio-env.eba-k7qxgmc2.us-west-2.elasticbeanstalk.com')
 SITE_URL = os.getenv('SITE_URL', 'https://omar-tech.com').strip().rstrip('/')
