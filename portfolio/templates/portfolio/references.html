@@ -47,7 +47,7 @@
                     <div class="testi-top">
                         {% if t.project %}
                         <div class="testi-project-thumb">
-                            <img src="{{ t.project.thumbnail.url }}" alt="{{ t.project.title }}">
+                            <img src="{{ t.project.thumbnail_url }}" alt="{{ t.project.title }}">
                         </div>
                         {% endif %}
                         <div class="testi-stars">
@@ -58,8 +58,8 @@
                     </div>
                     <p class="testi-quote">"{{ t.content }}"</p>
                     <div class="testi-author">
-                        {% if t.author_photo %}
-                        <img src="{{ t.author_photo.url }}" alt="{{ t.author_name }}" class="testi-avatar">
+                        {% if t.author_photo_url %}
+                        <img src="{{ t.author_photo_url }}" alt="{{ t.author_name }}" class="testi-avatar">
                         {% else %}
                         <div class="testi-avatar-placeholder">{{ t.author_name|first }}</div>
                         {% endif %}

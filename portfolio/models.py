@@ -89,26 +89,15 @@ class SiteProfile(models.Model):
     experience_label = models.CharField(_('libellé expérience'), max_length=120, default="Ans d'expérience")
     impact_value = models.CharField(_('valeur impact'), max_length=40, default='B2B')
     impact_label = models.CharField(_('libellé impact'), max_length=120, default='Approche orientée impact')
-    profile_photo = models.ImageField(
-        _('photo de profil'),
-        upload_to='profile/',
+    profile_photo_url = models.URLField(
+        _('URL photo de profil'),
         blank=True,
-        validators=[
-            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-            FileSizeValidator(5),
-            _validate_image_content,
-        ],
-        help_text='Image recommandee: 1200x1500 px minimum, ratio portrait 4:5, visage bien centre avec espace au-dessus de la tete.',
+        help_text='URL publique de la photo de profil (hébergée sur Supabase).',
     )
-    about_photo = models.ImageField(
-        _('photo à propos'),
-        upload_to='profile/',
+    about_photo_url = models.URLField(
+        _('URL photo à propos'),
         blank=True,
-        validators=[
-            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-            FileSizeValidator(5),
-            _validate_image_content,
-        ],
+        help_text='URL publique de la photo à propos (hébergée sur Supabase).',
     )
     about_title = models.CharField(_('titre à propos'), max_length=180, default='Ingénieur orienté business, livraison rapide et impact mesurable.')
     about_intro = CKEditor5Field(
@@ -343,6 +332,7 @@ class HeroSlide(models.Model):
 
 
 class Service(models.Model):
+    demo_video_url = models.URLField(_('URL vidéo démo'), blank=True, help_text=_('URL publique de la vidéo de démonstration (Supabase).'))
     icon = models.CharField(_('icône'), max_length=60, help_text=_("Classe Font Awesome ex: fas fa-brain"))
     title = models.CharField(_('titre'), max_length=100)
     description = CKEditor5Field(_('description'))
@@ -354,8 +344,8 @@ class Service(models.Model):
         blank=True,
         help_text=_('Un point par ligne pour affichage en liste.'),
     )
-    cover_image = models.ImageField(_('image principale'), upload_to='services/', blank=True)
-    secondary_image = models.ImageField(_('image secondaire'), upload_to='services/', blank=True)
+    cover_image_url = models.URLField(_('URL image principale'), blank=True, help_text=_('URL publique de l\'image principale (Supabase).'))
+    secondary_image_url = models.URLField(_('URL image secondaire'), blank=True, help_text=_('URL publique de l\'image secondaire (Supabase).'))
     demo_video_file = models.FileField(
         _('vidéo démonstration'),
         upload_to='services/',
@@ -469,6 +459,7 @@ class ProjectCategory(models.Model):
 
 
 class Project(models.Model):
+    demo_video_url = models.URLField(_('URL vidéo démo'), blank=True, help_text=_('URL publique de la vidéo de démonstration (Supabase).'))
     title = models.CharField(_('titre'), max_length=150)
     slug = models.SlugField(_('slug'), unique=True)
     category = models.ForeignKey(
@@ -482,15 +473,10 @@ class Project(models.Model):
     challenge = CKEditor5Field(_('problème'), blank=True, help_text=_("Problème client résolu"))
     solution = CKEditor5Field(_('solution'), blank=True, help_text=_("Solution apportée"))
     result = CKEditor5Field(_('résultat'), blank=True, help_text=_("Résultat mesurable ex: +32% conversion"))
-    thumbnail = models.ImageField(
-        _('miniature'),
-        upload_to='projects/thumbnails/',
-        validators=[
-            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-            FileSizeValidator(8),
-            _validate_image_content,
-        ],
-        help_text=_("Image recommandée: 1600x1000 px minimum, ratio 16:10, cadrage horizontal propre."),
+    thumbnail_url = models.URLField(
+        _('URL miniature'),
+        blank=True,
+        help_text=_('URL publique de la miniature (Supabase).'),
     )
     demo_video_file = models.FileField(
         _('fichier vidéo de démo'),
@@ -596,15 +582,10 @@ class Testimonial(models.Model):
     author_role = models.CharField(_('fonction'), max_length=150, help_text=_("ex: COO, RetailTech Paris"))
     author_email = models.EmailField(_('email'), blank=True)
     company_name = models.CharField(_('entreprise'), max_length=150, blank=True)
-    author_photo = models.ImageField(
-        _('photo'),
-        upload_to='avatars/',
+    author_photo_url = models.URLField(
+        _('URL photo auteur'),
         blank=True,
-        validators=[
-            FileExtensionValidator(['jpg', 'jpeg', 'png', 'webp']),
-            FileSizeValidator(3),
-            _validate_image_content,
-        ],
+        help_text=_('URL publique de la photo auteur (Supabase).'),
     )
     content = models.TextField(_('contenu'))
     rating = models.PositiveSmallIntegerField(

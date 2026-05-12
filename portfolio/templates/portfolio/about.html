@@ -15,12 +15,12 @@
             <!-- Sidebar -->
             <div class="col-lg-3">
                 <div class="profile-card text-center reveal">
-                    {% if site_profile.about_photo %}
-                    <img src="{{ site_profile.about_photo.url }}" alt="{{ site_profile.full_name }}" class="profile-photo">
-                    {% elif site_profile.profile_photo %}
-                    <img src="{{ site_profile.profile_photo.url }}" alt="{{ site_profile.full_name }}" class="profile-photo">
+                    {% if site_profile.about_photo_url %}
+                    <img src="{{ site_profile.about_photo_url }}" alt="{{ site_profile.full_name }}" class="profile-photo">
+                    {% elif site_profile.profile_photo_url %}
+                    <img src="{{ site_profile.profile_photo_url }}" alt="{{ site_profile.full_name }}" class="profile-photo">
                     {% else %}
-                    <img src="{% static 'img/about.svg' %}" alt="{{ site_profile.full_name }}" class="profile-photo">
+                    <img src="{{ SUPABASE_FILES_URL }}img/about.svg" alt="{{ site_profile.full_name }}" class="profile-photo">
                     {% endif %}
                     <h2 class="profile-name">{{ site_profile.full_name }}</h2>
                     <p class="profile-role">{{ site_profile.hero_role }}</p>
@@ -84,7 +84,7 @@
                                         {% endif %}
                                     {% endwith %}
                                 {% else %}
-                                    <img src="{% static 'img/ibm.svg' %}" alt="IBM">
+                                    <img src="{{ SUPABASE_FILES_URL }}img/ibm.svg" alt="IBM">
                                 {% endif %}
                                 <span>{{ site_profile.primary_certificate_label }}</span>
                             </a>
@@ -102,7 +102,7 @@
                                         {% endif %}
                                     {% endwith %}
                                 {% else %}
-                                    <img src="{% static 'img/ia.svg' %}" alt="IBM AI">
+                                    <img src="{{ SUPABASE_FILES_URL }}img/ia.svg" alt="IBM AI">
                                 {% endif %}
                                 <span>{{ site_profile.secondary_certificate_label }}</span>
                             </a>

@@ -5,7 +5,7 @@
 {% block meta_description %}{{ service.summary|default:service.description|striptags|truncatewords:26 }}{% endblock %}
 {% block og_title %}{{ service.title }} | {{ site_profile.full_name|default:'Omar Atta' }}{% endblock %}
 {% block og_description %}{{ service.summary|default:service.description|striptags|truncatewords:26 }}{% endblock %}
-{% block og_image %}{{ service_og_image_url|default:site_url }}/static/img/og-cover.png{% endblock %}
+{% block og_image %}{{ SUPABASE_FILES_URL }}img/og-cover.png{% endblock %}
 
 {% block content %}
 <section class="service-detail-hero">
@@ -29,25 +29,39 @@
     <div class="container">
         <div class="service-detail-layout">
             <div class="service-detail-main">
-                {% if service.cover_image or service.secondary_image %}
+                {% if service.cover_image_url or service.secondary_image_url %}
                 <div class="service-media-grid">
-                    {% if service.cover_image %}
+                    {% if service.cover_image_url %}
                     <div class="service-media-card">
-                        <img src="{{ service.cover_image.url }}" alt="{{ service.title }}" loading="lazy" decoding="async">
+                        <img src="{{ service.cover_image_url }}" alt="{{ service.title }}" loading="lazy" decoding="async">
                     </div>
                     {% endif %}
-                    {% if service.secondary_image %}
+                    {% if service.secondary_image_url %}
                     <div class="service-media-card">
-                        <img src="{{ service.secondary_image.url }}" alt="{{ service.title }}" loading="lazy" decoding="async">
+                        <img src="{{ service.secondary_image_url }}" alt="{{ service.title }}" loading="lazy" decoding="async">
                     </div>
                     {% endif %}
                 </div>
                 {% endif %}
 
-                {% if service.has_video %}
                 <div class="service-video-block">
                     <video controls playsinline preload="metadata" class="service-video-player">
-                        <source src="{{ service.demo_video_file.url }}" type="{{ service.get_video_mime_type }}">
+                        <source src="{{ SUPABASE_FILES_URL }}{{ service.demo_video_file.name }}" type="{{ service.get_video_mime_type }}">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                </div>
+                {% endif %}
+                {% if service.demo_video_url %}
+                <div class="service-video-block">
+                    <video controls playsinline preload="metadata" class="service-video-player">
+                        <source src="{{ service.demo_video_url }}">
+                        Votre navigateur ne supporte pas la lecture vidéo.
+                    </video>
+                </div>
+                {% elif service.has_video %}
+                <div class="service-video-block">
+                    <video controls playsinline preload="metadata" class="service-video-player">
+                        <source src="{{ SUPABASE_FILES_URL }}{{ service.demo_video_file.name }}" type="{{ service.get_video_mime_type }}">
                         Votre navigateur ne supporte pas la lecture vidéo.
                     </video>
                 </div>

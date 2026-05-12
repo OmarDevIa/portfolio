@@ -2,10 +2,11 @@ import importlib.util
 import os
 import sys
 from pathlib import Path
-
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 
 def env_bool(name, default=False):
@@ -30,14 +31,14 @@ def build_csrf_trusted_origins():
 BASE_DIR = Path(__file__).resolve().parent.parent
 RUNNING_TESTS = 'test' in sys.argv
 
-DEBUG = env_bool('DEBUG', False)
+DEBUG = env_bool('DEBUG', True)
 SECRET_KEY = os.getenv('SECRET_KEY', '').strip()
 #if not SECRET_KEY or 'insecure' in SECRET_KEY:
     #if not DEBUG:
         #raise RuntimeError('SECRET_KEY must be set to a secure value in production. Set it in your .env file.')
         #SECRET_KEY = SECRET_KEY or 'django-insecure-dev-only-change-me'
 
-ALLOWED_HOSTS = split_env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,django-porfolio-env.eba-k7qxgmc2.us-west-2.elasticbeanstalk.com')
+ALLOWED_HOSTS = ['*']
 SITE_URL = os.getenv('SITE_URL', 'https://omar-tech.com').strip().rstrip('/')
 ADMIN_URL = os.getenv('ADMIN_URL', 'amarou-wankoye1897/').strip().lstrip('/')
 ADMIN_BASE_PATH = f'/{ADMIN_URL.rstrip("/")}/'
@@ -95,6 +96,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'portfolio.context_processors.supabase_file_url',
             ],
         },
     },
@@ -102,11 +104,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'portfolio_site.wsgi.application'
 
+
+#DATABASES = {
+    #'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+#}
+
+
+from urllib.parse import quote_plus
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -126,7 +136,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://trqmnvqpwnlimofnsyfi.supabase.co/storage/v1/object/public/portfolio/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

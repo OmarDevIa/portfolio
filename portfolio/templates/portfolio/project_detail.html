@@ -22,11 +22,11 @@
 {% block meta_description %}{{ project.short_description }}{% endblock %}
 {% block og_title %}{{ project.title }} | Omar Atta{% endblock %}
 {% block og_description %}{{ project.short_description }}{% endblock %}
-{% block og_image %}{{ project_og_image_url|default:project.thumbnail.url }}{% endblock %}
+{% block og_image %}{{ project_og_image_url|default:project.thumbnail_url }}{% endblock %}
 {% block og_image_alt %}{{ project.title }} — {{ project.category.name }}{% endblock %}
 {% block twitter_title %}{{ project.title }} | Omar Atta{% endblock %}
 {% block twitter_description %}{{ project.short_description }}{% endblock %}
-{% block twitter_image %}{{ project_og_image_url|default:project.thumbnail.url }}{% endblock %}
+{% block twitter_image %}{{ project_og_image_url|default:project.thumbnail_url }}{% endblock %}
 
 {% block content %}
 <div style="padding-top: 80px;">
@@ -76,7 +76,7 @@
                         <div class="pd-browser-bar">
                             <span></span><span></span><span></span>
                         </div>
-                        <img src="{{ project.thumbnail.url }}" alt="{{ project.title }}" class="pd-img">
+                        <img src="{{ project.thumbnail_url }}" alt="{{ project.title }}" class="pd-img">
                     </div>
                 </div>
             </div>
@@ -112,14 +112,26 @@
                 <div class="col-lg-8">
 
                     <!-- Vidéo -->
-                    {% if project.has_video and project.demo_video_file %}
+                    {% if project.demo_video_url %}
                     <div class="pd-section">
                         <h3 class="pd-section-title"><i class="fas fa-play-circle"></i> Démonstration vidéo</h3>
                         <div class="pd-video-wrap">
                             <video controls playsinline preload="metadata" controlslist="nodownload noplaybackrate"
-                                   disablepictureinpicture poster="{{ project.thumbnail.url }}"
+                                   disablepictureinpicture poster="{{ project.thumbnail_url }}"
                                    class="pd-video">
-                                <source src="{{ project.demo_video_file.url }}" type="{{ project.get_video_mime_type }}">
+                                <source src="{{ project.demo_video_url }}">
+                                Votre navigateur ne supporte pas la lecture vidéo.
+                            </video>
+                        </div>
+                    </div>
+                    {% elif project.has_video and project.demo_video_file %}
+                    <div class="pd-section">
+                        <h3 class="pd-section-title"><i class="fas fa-play-circle"></i> Démonstration vidéo</h3>
+                        <div class="pd-video-wrap">
+                            <video controls playsinline preload="metadata" controlslist="nodownload noplaybackrate"
+                                   disablepictureinpicture poster="{{ project.thumbnail_url }}"
+                                   class="pd-video">
+                                <source src="{{ SUPABASE_FILES_URL }}{{ project.demo_video_file.name }}" type="{{ project.get_video_mime_type }}">
                                 Votre navigateur ne supporte pas la lecture vidéo.
                             </video>
                         </div>
@@ -214,7 +226,7 @@
                             {% for r in related %}
                             <a href="{% url 'project_detail' r.slug %}" class="pd-related-item">
                                 <div class="pd-related-thumb">
-                                    <img src="{{ r.thumbnail.url }}" alt="{{ r.title }}">
+                                    <img src="{{ r.thumbnail_url }}" alt="{{ r.title }}">
                                 </div>
                                 <div>
                                     <strong>{{ r.title }}</strong>

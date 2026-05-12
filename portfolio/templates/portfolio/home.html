@@ -11,8 +11,8 @@
             <!-- Sidebar flottante sticky -->
             <div class="col-lg-3">
                 <div class="profile-card text-center reveal">
-                    {% if site_profile.profile_photo %}
-                    <img src="{{ site_profile.profile_photo.url }}"
+                    {% if site_profile.profile_photo_url %}
+                    <img src="{{ site_profile.profile_photo_url }}"
                         alt="{{ site_profile.full_name }}"
                         class="profile-photo"
                         fetchpriority="high"
@@ -20,7 +20,7 @@
                         width="160"
                         height="160">
                     {% else %}
-                    <img src="{% static 'img/profile.svg' %}"
+                    <img src="{{ SUPABASE_FILES_URL }}img/profile.svg"
                          alt="{{ site_profile.full_name }}"
                          class="profile-photo"
                         fetchpriority="high"
@@ -148,14 +148,14 @@
             <span class="cert-proof-label"><i class="fas fa-certificate"></i> Certifications vérifiables</span>
             {% if site_profile.primary_certificate_url %}
             <a href="{{ site_profile.primary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-proof-badge">
-                <img src="{% static 'img/ibm.svg' %}" alt="IBM" loading="lazy" decoding="async" width="20" height="20">
+                <img src="{{ SUPABASE_FILES_URL }}img/ibm.svg" alt="IBM" loading="lazy" decoding="async" width="20" height="20">
                 {{ site_profile.primary_certificate_label }}
                 <i class="fas fa-arrow-up-right-from-square"></i>
             </a>
             {% endif %}
             {% if site_profile.secondary_certificate_url %}
             <a href="{{ site_profile.secondary_certificate_url }}" target="_blank" rel="noopener noreferrer" class="cert-proof-badge">
-                <img src="{% static 'img/ia.svg' %}" alt="IBM AI" loading="lazy" decoding="async" width="20" height="20">
+                <img src="{{ SUPABASE_FILES_URL }}img/ia.svg" alt="IBM AI" loading="lazy" decoding="async" width="20" height="20">
                 {{ site_profile.secondary_certificate_label }}
                 <i class="fas fa-arrow-up-right-from-square"></i>
             </a>
@@ -220,7 +220,7 @@
                 <div class="col-lg-4 col-md-6 project-item animate-up" data-category="{{ project.category.slug }}" style="animation-delay:{{ forloop.counter0 }}00ms">
                     <div class="project-item-card reveal">
                         <div class="project-img-wrap">
-                               <img src="{{ project.thumbnail.url }}"
+                               <img src="{{ project.thumbnail_url }}"
                                    alt="{{ project.title }}"
                                    loading="lazy"
                                    decoding="async">
@@ -265,7 +265,7 @@
                     <div class="testi-top">
                         {% if t.project %}
                         <div class="testi-project-thumb">
-                            <img src="{{ t.project.thumbnail.url }}" alt="{{ t.project.title }}" loading="lazy" decoding="async">
+                            <img src="{{ t.project.thumbnail_url }}" alt="{{ t.project.title }}" loading="lazy" decoding="async">
                         </div>
                         {% endif %}
                         <div class="testi-stars">
@@ -276,8 +276,8 @@
                     </div>
                     <p class="testi-quote">"{{ t.content }}"</p>
                     <div class="testi-author">
-                        {% if t.author_photo %}
-                        <img src="{{ t.author_photo.url }}" alt="{{ t.author_name }}" class="testi-avatar" loading="lazy" decoding="async" width="46" height="46">
+                        {% if t.author_photo_url %}
+                        <img src="{{ t.author_photo_url }}" alt="{{ t.author_name }}" class="testi-avatar" loading="lazy" decoding="async" width="46" height="46">
                         {% else %}
                         <div class="testi-avatar-placeholder">{{ t.author_name|first }}</div>
                         {% endif %}

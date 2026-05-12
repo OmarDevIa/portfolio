@@ -125,7 +125,7 @@ class ProjectAdmin(admin.ModelAdmin):
         }),
         ('Médias', {
             'description': 'Miniature recommandée: 1600x1000 px minimum, ratio 16:10 pour un rendu propre sur cartes et détail projet.',
-            'fields': ('thumbnail', 'demo_video_file')
+            'fields': ('thumbnail_url', 'demo_video_url', 'demo_video_file')
         }),
         ('Liens & Tags', {
             'fields': ('live_url', 'github_url', 'tags')
@@ -151,7 +151,7 @@ class SiteProfileAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Identité', {
             'description': 'Photo de profil recommandee: 1200x1500 px minimum, ratio 4:5, cadrage vertical propre avec le visage visible.',
-            'fields': ('full_name', 'brand_name', 'profile_photo', 'about_photo', 'cv_file')
+            'fields': ('full_name', 'brand_name', 'profile_photo_url', 'about_photo_url', 'cv_file')
         }),
         ('Hero', {
             'fields': ('hero_badge_text', 'hero_role', 'hero_highlight', 'hero_description', 'hero_signals')
@@ -225,7 +225,7 @@ class ServiceAdmin(admin.ModelAdmin):
             'fields': ('description', 'summary', 'full_description', 'detail_points')
         }),
         ('Médias', {
-            'fields': ('cover_image', 'secondary_image', 'demo_video_file')
+            'fields': ('cover_image_url', 'secondary_image_url', 'demo_video_file')
         }),
     )
 

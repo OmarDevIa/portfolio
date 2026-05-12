@@ -149,11 +149,14 @@ def _build_home_context(request, contact_form=None, testimonial_form=None):
                 'count': grouped_projects.count(),
             })
 
-    cert_total = site_profile.certification_badges.count()
-    if site_profile.primary_certificate_label:
-        cert_total += 1
-    if site_profile.secondary_certificate_label:
-        cert_total += 1
+    if site_profile and site_profile.pk:
+        cert_total = site_profile.certification_badges.count()
+        if site_profile.primary_certificate_label:
+            cert_total += 1
+        if site_profile.secondary_certificate_label:
+            cert_total += 1
+    else:
+        cert_total = 0
 
     context = {
         'projects': projects,
